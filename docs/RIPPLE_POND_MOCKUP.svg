@@ -1,0 +1,384 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 768" width="1200" height="768" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+  <title>Ripple Pond - concept mock-up of the level screen during play</title>
+  <defs>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f8298"/>
+      <stop offset="1" stop-color="#256b81"/>
+    </linearGradient>
+    <clipPath id="play"><rect x="0" y="0" width="960" height="640"/></clipPath>
+    <marker id="arrowWhite" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#ffffff"/>
+    </marker>
+
+    <!-- Frog, facing up the screen -->
+    <g id="frog">
+      <ellipse cx="-15" cy="11" rx="9" ry="6" transform="rotate(-25 -15 11)" fill="#2f8a3e" stroke="#1f6b2e" stroke-width="1.5"/>
+      <ellipse cx="15" cy="11" rx="9" ry="6" transform="rotate(25 15 11)" fill="#2f8a3e" stroke="#1f6b2e" stroke-width="1.5"/>
+      <ellipse cx="-14" cy="-6" rx="5" ry="3.2" fill="#2f8a3e" stroke="#1f6b2e" stroke-width="1.2"/>
+      <ellipse cx="14" cy="-6" rx="5" ry="3.2" fill="#2f8a3e" stroke="#1f6b2e" stroke-width="1.2"/>
+      <ellipse cx="0" cy="0" rx="15" ry="17" fill="#4cba5d" stroke="#1f6b2e" stroke-width="2"/>
+      <ellipse cx="0" cy="4" rx="8" ry="9" fill="#8fdc99" opacity="0.55"/>
+      <circle cx="-8" cy="-13" r="6" fill="#4cba5d" stroke="#1f6b2e" stroke-width="1.5"/>
+      <circle cx="8" cy="-13" r="6" fill="#4cba5d" stroke="#1f6b2e" stroke-width="1.5"/>
+      <circle cx="-8" cy="-14" r="3.6" fill="#f6f8ea"/>
+      <circle cx="8" cy="-14" r="3.6" fill="#f6f8ea"/>
+      <circle cx="-8" cy="-15" r="2" fill="#10210f"/>
+      <circle cx="8" cy="-15" r="2" fill="#10210f"/>
+    </g>
+
+    <!-- Lily pad, radius 30 -->
+    <g id="pad">
+      <path d="M0,0 L30,-6 A30.6,30.6 0 1,0 30,6 Z" fill="#62c466" stroke="#2f8a3e" stroke-width="2" stroke-linejoin="round"/>
+      <g stroke="#3d9d48" stroke-width="1.4" opacity="0.65" stroke-linecap="round">
+        <line x1="0" y1="0" x2="-26" y2="0"/>
+        <line x1="0" y1="0" x2="-14" y2="-22"/>
+        <line x1="0" y1="0" x2="-14" y2="22"/>
+        <line x1="0" y1="0" x2="12" y2="-24"/>
+        <line x1="0" y1="0" x2="12" y2="24"/>
+      </g>
+    </g>
+
+    <!-- Reed patch, about 110 wide -->
+    <g id="reeds">
+      <g fill="#2c6a45">
+        <circle cx="-30" cy="-6" r="24"/>
+        <circle cx="0" cy="-16" r="26"/>
+        <circle cx="30" cy="-4" r="24"/>
+        <circle cx="-14" cy="16" r="24"/>
+        <circle cx="18" cy="18" r="23"/>
+      </g>
+      <g fill="#3f8a59">
+        <circle cx="-28" cy="-10" r="9"/>
+        <circle cx="4" cy="-20" r="10"/>
+        <circle cx="30" cy="-2" r="9"/>
+        <circle cx="-10" cy="16" r="10"/>
+        <circle cx="20" cy="20" r="8"/>
+        <circle cx="2" cy="2" r="8"/>
+      </g>
+      <g fill="#7a4a22" stroke="#4d2d12" stroke-width="1">
+        <ellipse cx="-28" cy="-10" rx="3.5" ry="5"/>
+        <ellipse cx="4" cy="-20" rx="3.5" ry="5"/>
+        <ellipse cx="30" cy="-2" rx="3.5" ry="5"/>
+        <ellipse cx="-10" cy="16" rx="3.5" ry="5"/>
+        <ellipse cx="20" cy="20" rx="3.5" ry="5"/>
+        <ellipse cx="2" cy="2" rx="3.5" ry="5"/>
+      </g>
+    </g>
+
+    <!-- Fish shape, facing right, about 76 long -->
+    <g id="fishShape">
+      <polygon points="-24,0 -44,-13 -38,0 -44,13"/>
+      <path d="M32,0 C20,-16 -10,-14 -26,0 C-10,14 20,16 32,0 Z"/>
+      <polygon points="2,-11 -8,-19 -8,-10"/>
+      <polygon points="2,11 -8,19 -8,10"/>
+    </g>
+
+    <!-- Bird shape, flying up the screen, wingspan about 116 -->
+    <g id="birdShape">
+      <path d="M-5,-8 C-28,-22 -50,-12 -58,6 C-40,0 -22,4 -5,8 Z"/>
+      <path d="M5,-8 C28,-22 50,-12 58,6 C40,0 22,4 5,8 Z"/>
+      <polygon points="-6,14 6,14 9,28 0,24 -9,28"/>
+      <ellipse cx="0" cy="0" rx="8" ry="17"/>
+      <circle cx="0" cy="-19" r="6.5"/>
+    </g>
+
+    <!-- Pickup ring -->
+    <circle id="pickRing" r="17" fill="#ffffff" fill-opacity="0.10" stroke="#ffffff" stroke-opacity="0.75" stroke-width="1.5" stroke-dasharray="3 4"/>
+
+    <!-- Small tuft of grass -->
+    <path id="tuft" d="M-5,4 L-2,-4 M0,4 L0,-6 M5,4 L2,-4" stroke="#55883c" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  </defs>
+
+  <!-- ============ Window background ============ -->
+  <rect width="1200" height="768" fill="#132329"/>
+
+  <!-- ============ Play area: 960 x 640, positions are fractions of this box ============ -->
+  <g transform="translate(0,64)">
+    <g clip-path="url(#play)">
+      <rect width="960" height="640" fill="url(#water)"/>
+
+      <!-- Flowing water: streaks that drift left to right in the real game -->
+      <g fill="none" stroke="#9fdbe6" stroke-width="2.2" stroke-linecap="round" opacity="0.26">
+        <path d="M-20,112 q40,-10 80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0" stroke-dasharray="70 110"/>
+        <path d="M-20,168 q40,-10 80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0" stroke-dasharray="50 130" stroke-dashoffset="60"/>
+        <path d="M-20,236 q40,-10 80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0" stroke-dasharray="80 100" stroke-dashoffset="120"/>
+        <path d="M-20,300 q40,-10 80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0" stroke-dasharray="60 140" stroke-dashoffset="30"/>
+        <path d="M-20,366 q40,-10 80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0" stroke-dasharray="70 120" stroke-dashoffset="150"/>
+        <path d="M-20,430 q40,-10 80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0" stroke-dasharray="55 125" stroke-dashoffset="80"/>
+        <path d="M-20,494 q40,-10 80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0" stroke-dasharray="75 105" stroke-dashoffset="10"/>
+        <path d="M-20,540 q40,-10 80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0 t80,0" stroke-dasharray="45 135" stroke-dashoffset="100"/>
+      </g>
+
+      <!-- Far bank (the goal) -->
+      <path d="M0,72 q60,14 120,4 t120,2 t120,-4 t120,6 t120,-2 t120,4 t120,-4 t120,2 V-10 H0 Z" fill="#7cae58"/>
+      <path d="M0,72 q60,14 120,4 t120,2 t120,-4 t120,6 t120,-2 t120,4 t120,-4 t120,2" fill="none" stroke="#e6d7a0" stroke-width="8"/>
+      <path d="M0,81 q60,14 120,4 t120,2 t120,-4 t120,6 t120,-2 t120,4 t120,-4 t120,2" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2"/>
+
+      <!-- Start bank -->
+      <path d="M0,568 q60,-12 120,-3 t120,2 t120,-4 t120,5 t120,-2 t120,3 t120,-4 t120,2 V650 H0 Z" fill="#7cae58"/>
+      <path d="M0,568 q60,-12 120,-3 t120,2 t120,-4 t120,5 t120,-2 t120,3 t120,-4 t120,2" fill="none" stroke="#e6d7a0" stroke-width="8"/>
+      <path d="M0,559 q60,-12 120,-3 t120,2 t120,-4 t120,5 t120,-2 t120,3 t120,-4 t120,2" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2"/>
+
+      <!-- Grass tufts -->
+      <use xlink:href="#tuft" href="#tuft" x="70" y="30"/>
+      <use xlink:href="#tuft" href="#tuft" x="210" y="48"/>
+      <use xlink:href="#tuft" href="#tuft" x="350" y="24"/>
+      <use xlink:href="#tuft" href="#tuft" x="610" y="40"/>
+      <use xlink:href="#tuft" href="#tuft" x="905" y="34"/>
+      <use xlink:href="#tuft" href="#tuft" x="120" y="606"/>
+      <use xlink:href="#tuft" href="#tuft" x="300" y="620"/>
+      <use xlink:href="#tuft" href="#tuft" x="560" y="604"/>
+      <use xlink:href="#tuft" href="#tuft" x="700" y="622"/>
+      <use xlink:href="#tuft" href="#tuft" x="880" y="602"/>
+    </g>
+
+    <!-- Reeds: solid, block ripples and floating objects -->
+    <use xlink:href="#reeds" href="#reeds" x="259" y="320"/>
+    <use xlink:href="#reeds" href="#reeds" x="797" y="428" transform="rotate(20 797 428)"/>
+
+    <!-- Turtle asleep on the bottom -->
+    <g transform="translate(144,392)" opacity="0.82">
+      <g fill="#8fae58" stroke="#3f5a22" stroke-width="1.5">
+        <ellipse cx="-16" cy="-19" rx="7" ry="5"/>
+        <ellipse cx="16" cy="-19" rx="7" ry="5"/>
+        <ellipse cx="-16" cy="19" rx="7" ry="5"/>
+        <ellipse cx="16" cy="19" rx="7" ry="5"/>
+        <polygon points="-23,-3 -32,0 -23,3"/>
+        <circle cx="29" cy="0" r="7.5"/>
+      </g>
+      <ellipse cx="0" cy="0" rx="24" ry="20" fill="#6f8f3f" stroke="#3f5a22" stroke-width="2"/>
+      <g fill="none" stroke="#3f5a22" stroke-width="1.3" opacity="0.8">
+        <polygon points="-9,-8 9,-8 13,0 9,8 -9,8 -13,0"/>
+        <line x1="-9" y1="-8" x2="-14" y2="-16"/>
+        <line x1="9" y1="-8" x2="14" y2="-16"/>
+        <line x1="-9" y1="8" x2="-14" y2="16"/>
+        <line x1="9" y1="8" x2="14" y2="16"/>
+        <line x1="-13" y1="0" x2="-24" y2="0"/>
+        <line x1="13" y1="0" x2="24" y2="0"/>
+      </g>
+      <path d="M26,-2 q3,2 6,0" fill="none" stroke="#263a14" stroke-width="1.3" stroke-linecap="round"/>
+      <text x="34" y="-18" font-size="13" font-weight="700" fill="#ffffff" opacity="0.9">z</text>
+      <text x="43" y="-28" font-size="16" font-weight="700" fill="#ffffff" opacity="0.9">z</text>
+    </g>
+
+    <!-- Lily pads placed by the level -->
+    <use xlink:href="#pad" href="#pad" x="317" y="141" transform="rotate(200 317 141)"/>
+    <use xlink:href="#pad" href="#pad" x="480" y="124" transform="rotate(75 480 124)"/>
+    <use xlink:href="#pad" href="#pad" x="499" y="246" transform="rotate(140 499 246)"/>
+    <use xlink:href="#pad" href="#pad" x="838" y="146" transform="rotate(20 838 146)"/>
+    <use xlink:href="#pad" href="#pad" x="662" y="211" transform="rotate(300 662 211)"/>
+
+    <!-- Thrown earlier: a log near the start bank and a plank mid-river -->
+    <g transform="translate(422,486) rotate(-8)">
+      <rect x="-86" y="-20" width="172" height="40" rx="18" fill="#8b5e3c" stroke="#5d3d22" stroke-width="2"/>
+      <g stroke="#6f4729" stroke-width="1.6" stroke-linecap="round">
+        <line x1="-62" y1="-8" x2="-18" y2="-8"/>
+        <line x1="-40" y1="4" x2="20" y2="4"/>
+        <line x1="6" y1="-10" x2="52" y2="-10"/>
+        <line x1="-66" y1="10" x2="-48" y2="10"/>
+      </g>
+      <ellipse cx="76" cy="0" rx="7" ry="15" fill="#caa06c" stroke="#5d3d22" stroke-width="1.5"/>
+      <ellipse cx="76" cy="0" rx="3" ry="7" fill="none" stroke="#8b5e3c" stroke-width="1.2"/>
+    </g>
+    <g transform="translate(480,350) rotate(6)">
+      <rect x="-48" y="-22" width="96" height="44" rx="4" fill="#d2a469" stroke="#8a6235" stroke-width="2"/>
+      <g stroke="#b3854c" stroke-width="1.4" stroke-linecap="round">
+        <line x1="-40" y1="-9" x2="40" y2="-9"/>
+        <line x1="-40" y1="4" x2="12" y2="4"/>
+        <line x1="-18" y1="14" x2="40" y2="14"/>
+      </g>
+    </g>
+
+    <!-- Thrown this turn: a twig, with its ripple spreading as a circle -->
+    <g fill="none" stroke="#ffffff">
+      <circle cx="595" cy="256" r="77" stroke-width="3.5" opacity="0.8"/>
+      <circle cx="595" cy="256" r="52" stroke-width="2.2" opacity="0.4"/>
+      <circle cx="595" cy="256" r="28" stroke-width="1.6" opacity="0.25"/>
+    </g>
+    <g transform="translate(595,256) rotate(-12)" stroke="#6b4526" stroke-width="6" stroke-linecap="round" fill="none">
+      <path d="M-24,4 L22,-3"/>
+      <path d="M2,0 L14,-13"/>
+    </g>
+    <!-- The ripple has just reached this lily pad and pushes it away from the twig -->
+    <line x1="690" y1="192" x2="724" y2="169" stroke="#ffffff" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowWhite)"/>
+
+    <!-- Food -->
+    <g transform="translate(422,192)">
+      <use xlink:href="#pickRing" href="#pickRing"/>
+      <ellipse cx="-6" cy="-2" rx="7" ry="3.6" transform="rotate(-28 -6 -2)" fill="#ffffff" opacity="0.8"/>
+      <ellipse cx="6" cy="-2" rx="7" ry="3.6" transform="rotate(28 6 -2)" fill="#ffffff" opacity="0.8"/>
+      <ellipse cx="0" cy="1" rx="3.6" ry="6" fill="#1d1d1d"/>
+    </g>
+    <g transform="translate(163,486)">
+      <use xlink:href="#pickRing" href="#pickRing"/>
+      <use xlink:href="#fishShape" href="#fishShape" transform="scale(0.34)" fill="#d5e8ee" stroke="#6d8f9c" stroke-width="3"/>
+      <circle cx="7" cy="-1.6" r="1.1" fill="#22313a"/>
+    </g>
+    <g transform="translate(605,128)">
+      <use xlink:href="#pickRing" href="#pickRing"/>
+      <polygon points="-8,-3 -3,-8 5,-7 9,-1 6,7 -2,8 -8,4" fill="#e4c58c" stroke="#a9844a" stroke-width="1.5" stroke-linejoin="round"/>
+      <circle cx="-2" cy="-2" r="1" fill="#a9844a"/>
+      <circle cx="3" cy="2" r="1" fill="#a9844a"/>
+    </g>
+
+    <!-- Throwable icons to gather -->
+    <g transform="translate(845,236)">
+      <circle r="20" fill="#f6efd9" stroke="#8a6235" stroke-width="2.5"/>
+      <rect x="-12" y="-5" width="24" height="10" rx="5" fill="#8b5e3c" stroke="#5d3d22" stroke-width="1.2"/>
+      <circle cx="15" cy="-15" r="7.5" fill="#f2bd4b" stroke="#8a6235" stroke-width="1.5"/>
+      <path d="M11.5,-15 H18.5 M15,-18.5 V-11.5" stroke="#3b2a10" stroke-width="1.8" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(77,300)">
+      <circle r="20" fill="#f6efd9" stroke="#8a6235" stroke-width="2.5"/>
+      <rect x="-11" y="-7" width="22" height="14" rx="2" fill="#d2a469" stroke="#8a6235" stroke-width="1.2"/>
+      <circle cx="15" cy="-15" r="7.5" fill="#f2bd4b" stroke="#8a6235" stroke-width="1.5"/>
+      <path d="M11.5,-15 H18.5 M15,-18.5 V-11.5" stroke="#3b2a10" stroke-width="1.8" stroke-linecap="round"/>
+    </g>
+
+    <!-- Predator: fish, with its reach -->
+    <circle cx="730" cy="320" r="58" fill="#ff6b5e" fill-opacity="0.08" stroke="#ff8e84" stroke-width="2" stroke-dasharray="6 6"/>
+    <g transform="translate(730,320) rotate(174)">
+      <use xlink:href="#fishShape" href="#fishShape" fill="#e8743b" stroke="#9c3f14" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M-18,0 H18" stroke="#9c3f14" stroke-width="1.4" opacity="0.6"/>
+      <circle cx="20" cy="-6" r="2.4" fill="#1d1208"/>
+      <circle cx="20" cy="6" r="2.4" fill="#1d1208"/>
+    </g>
+
+    <!-- Predator: snake on the far bank -->
+    <g transform="translate(790,36)">
+      <path d="M-52,6 q13,-18 26,0 t26,0 t26,0 t22,-2" fill="none" stroke="#7d6a1c" stroke-width="12" stroke-linecap="round"/>
+      <path d="M-52,6 q13,-18 26,0 t26,0 t26,0 t22,-2" fill="none" stroke="#d2b93f" stroke-width="8" stroke-linecap="round"/>
+      <path d="M-52,6 q13,-18 26,0 t26,0 t26,0 t22,-2" fill="none" stroke="#7d6a1c" stroke-width="8" stroke-dasharray="3 11" opacity="0.75"/>
+      <ellipse cx="52" cy="3" rx="9" ry="6.5" fill="#d2b93f" stroke="#7d6a1c" stroke-width="2"/>
+      <circle cx="55" cy="0.5" r="1.4" fill="#1d1208"/>
+      <circle cx="55" cy="5.5" r="1.4" fill="#1d1208"/>
+      <path d="M61,3 h7 m0,0 l4,-3 m-4,3 l4,3" fill="none" stroke="#c0392b" stroke-width="1.4" stroke-linecap="round"/>
+    </g>
+
+    <!-- The frog's family waiting on the far bank -->
+    <use xlink:href="#frog" href="#frog" transform="translate(452,36) rotate(180) scale(0.95)"/>
+    <use xlink:href="#frog" href="#frog" transform="translate(498,34) rotate(180) scale(0.95)"/>
+    <use xlink:href="#frog" href="#frog" transform="translate(476,54) rotate(180) scale(0.6)"/>
+
+    <!-- Hop range of the frog at rank 3: 0.14 of the play-area width -->
+    <circle cx="480" cy="346" r="134" fill="#ffffff" fill-opacity="0.05" stroke="#fff2b8" stroke-opacity="0.75" stroke-width="2" stroke-dasharray="9 8"/>
+
+    <!-- Aim: the player is about to click this lily pad -->
+    <line x1="484" y1="326" x2="497" y2="262" stroke="#fff2b8" stroke-width="3" stroke-dasharray="2 8" stroke-linecap="round"/>
+    <circle cx="499" cy="246" r="35" fill="none" stroke="#fff2b8" stroke-width="2.5"/>
+
+    <!-- The frog, riding the plank -->
+    <use xlink:href="#frog" href="#frog" x="480" y="346"/>
+
+    <!-- Predator: bird in the air, with its shadow on the water -->
+    <use xlink:href="#birdShape" href="#birdShape" transform="translate(212,246) rotate(128) scale(0.92)" fill="#0b1a20" opacity="0.2"/>
+    <g transform="translate(192,222) rotate(128)">
+      <use xlink:href="#birdShape" href="#birdShape" fill="#44526e" stroke="#232c3d" stroke-width="2" stroke-linejoin="round"/>
+      <polygon points="-3,-24 3,-24 0,-33" fill="#f0b545" stroke="#8a6235" stroke-width="1"/>
+      <circle cx="-3" cy="-20" r="1.3" fill="#f6f8ea"/>
+      <circle cx="3" cy="-20" r="1.3" fill="#f6f8ea"/>
+    </g>
+
+    <!-- Tooltip next to the aim -->
+    <g transform="translate(312,222)">
+      <rect width="148" height="46" rx="8" fill="#132329" fill-opacity="0.92" stroke="#fff2b8" stroke-opacity="0.7" stroke-width="1"/>
+      <text x="12" y="19" font-size="13" font-weight="700" fill="#fff2b8">Hop 0.11</text>
+      <text x="12" y="36" font-size="12" fill="#e8f3ef">costs 2.2 energy</text>
+    </g>
+
+    <!-- Mouse pointer -->
+    <path d="M503,250 l0,20 l5,-5 l4,9 l4,-2 l-4,-9 l7,0 Z" fill="#ffffff" stroke="#132329" stroke-width="1.5" stroke-linejoin="round"/>
+  </g>
+
+  <!-- ============ Top bar ============ -->
+  <rect x="0" y="0" width="1200" height="64" fill="#132329"/>
+  <text x="20" y="28" font-size="15" font-weight="700" letter-spacing="1.5" fill="#e8f3ef">RIPPLE POND</text>
+  <text x="20" y="48" font-size="13" fill="#9fb7b0">Level 3 of 5</text>
+
+  <!-- Health -->
+  <path transform="translate(232,22) scale(1.3)" d="M0,7 C-12,-3 -5,-11 0,-4 C5,-11 12,-3 0,7 Z" fill="#e86a6a"/>
+  <text x="252" y="26" font-size="12" fill="#9fb7b0">Health</text>
+  <text x="432" y="26" font-size="13" font-weight="600" text-anchor="end" fill="#e8f3ef">11 / 14</text>
+  <rect x="252" y="36" width="180" height="10" rx="5" fill="#2a4048"/>
+  <rect x="252" y="36" width="141" height="10" rx="5" fill="#e86a6a"/>
+
+  <!-- Energy -->
+  <polygon transform="translate(482,22) scale(1.15)" points="2,-10 -6,2 0,2 -2,10 6,-2 0,-2" fill="#f2bd4b"/>
+  <text x="502" y="26" font-size="12" fill="#9fb7b0">Energy</text>
+  <text x="682" y="26" font-size="13" font-weight="600" text-anchor="end" fill="#e8f3ef">17.6 / 28</text>
+  <rect x="502" y="36" width="180" height="10" rx="5" fill="#2a4048"/>
+  <rect x="502" y="36" width="113" height="10" rx="5" fill="#f2bd4b"/>
+
+  <!-- Rank and experience -->
+  <polygon transform="translate(732,22)" points="0,-10 2.9,-3.1 10,-3.1 4.3,1.5 6.2,8.6 0,4.5 -6.2,8.6 -4.3,1.5 -10,-3.1 -2.9,-3.1" fill="#63c9b6"/>
+  <text x="752" y="26" font-size="12" fill="#9fb7b0">Rank 3</text>
+  <text x="932" y="26" font-size="13" font-weight="600" text-anchor="end" fill="#e8f3ef">138 / 200 XP</text>
+  <rect x="752" y="36" width="180" height="10" rx="5" fill="#2a4048"/>
+  <rect x="752" y="36" width="41" height="10" rx="5" fill="#63c9b6"/>
+
+  <!-- Turn counter -->
+  <text x="1180" y="29" font-size="18" font-weight="700" text-anchor="end" fill="#e8f3ef">Turn 7</text>
+  <text x="1180" y="48" font-size="13" text-anchor="end" fill="#9fb7b0">of 40</text>
+
+  <!-- ============ Side panel ============ -->
+  <rect x="960" y="64" width="240" height="640" fill="#1a2d34"/>
+  <line x1="960" y1="64" x2="960" y2="704" stroke="#0d181c" stroke-width="2"/>
+
+  <text x="976" y="96" font-size="11" font-weight="700" letter-spacing="1.5" fill="#9fb7b0">THROW BAG</text>
+
+  <g transform="translate(976,108)">
+    <rect width="208" height="48" rx="8" fill="#223a42"/>
+    <g transform="translate(30,24) rotate(-12)" stroke="#a9794a" stroke-width="5" stroke-linecap="round" fill="none">
+      <path d="M-16,3 L15,-2"/>
+      <path d="M1,0 L9,-9"/>
+    </g>
+    <text x="62" y="29" font-size="15" font-weight="600" fill="#e8f3ef">Twig</text>
+    <text x="194" y="29" font-size="15" font-weight="600" text-anchor="end" fill="#e8f3ef">x 1</text>
+  </g>
+  <g transform="translate(976,164)" opacity="0.45">
+    <rect width="208" height="48" rx="8" fill="#223a42"/>
+    <rect x="12" y="13" width="36" height="22" rx="3" fill="#d2a469" stroke="#8a6235" stroke-width="1.5"/>
+    <text x="62" y="29" font-size="15" font-weight="600" fill="#e8f3ef">Plank</text>
+    <text x="194" y="29" font-size="15" font-weight="600" text-anchor="end" fill="#e8f3ef">x 0</text>
+  </g>
+  <g transform="translate(976,220)">
+    <rect width="208" height="48" rx="8" fill="#223a42"/>
+    <rect x="8" y="15" width="44" height="18" rx="9" fill="#8b5e3c" stroke="#5d3d22" stroke-width="1.5"/>
+    <text x="62" y="29" font-size="15" font-weight="600" fill="#e8f3ef">Log</text>
+    <text x="194" y="29" font-size="15" font-weight="600" text-anchor="end" fill="#e8f3ef">x 1</text>
+  </g>
+  <text x="976" y="290" font-size="12" fill="#9fb7b0">Twig thrown this turn</text>
+
+  <text x="976" y="330" font-size="11" font-weight="700" letter-spacing="1.5" fill="#9fb7b0">MOVE</text>
+
+  <g transform="translate(976,342)">
+    <rect width="208" height="48" rx="8" fill="#223a42"/>
+    <text x="16" y="21" font-size="15" font-weight="600" fill="#e8f3ef">Walk</text>
+    <text x="16" y="38" font-size="11.5" fill="#9fb7b0">1 energy per 0.10</text>
+  </g>
+  <g transform="translate(976,398)">
+    <rect width="208" height="48" rx="8" fill="#1b7566" stroke="#63c9b6" stroke-width="2"/>
+    <text x="16" y="21" font-size="15" font-weight="700" fill="#ffffff">Hop</text>
+    <text x="16" y="38" font-size="11.5" fill="#d5f2ea">2 energy per 0.10 - range 0.14</text>
+  </g>
+  <g transform="translate(976,454)">
+    <rect width="208" height="48" rx="8" fill="#223a42"/>
+    <text x="16" y="21" font-size="15" font-weight="600" fill="#e8f3ef">Swim</text>
+    <text x="16" y="38" font-size="11.5" fill="#9fb7b0">4 energy per 0.10</text>
+  </g>
+
+  <rect x="976" y="560" width="208" height="52" rx="10" fill="#f2bd4b"/>
+  <text x="1080" y="592" font-size="17" font-weight="700" text-anchor="middle" fill="#1b2a20">End turn</text>
+
+  <rect x="976" y="624" width="100" height="40" rx="8" fill="none" stroke="#3f5c66" stroke-width="1.5"/>
+  <text x="1026" y="649" font-size="14" text-anchor="middle" fill="#e8f3ef">Undo</text>
+  <rect x="1084" y="624" width="100" height="40" rx="8" fill="none" stroke="#3f5c66" stroke-width="1.5"/>
+  <text x="1134" y="649" font-size="14" text-anchor="middle" fill="#e8f3ef">Reset</text>
+
+  <!-- ============ Message bar ============ -->
+  <rect x="0" y="704" width="1200" height="64" fill="#132329"/>
+  <line x1="0" y1="704" x2="1200" y2="704" stroke="#0d181c" stroke-width="2"/>
+  <text x="20" y="732" font-size="14.5" fill="#e8f3ef">You threw a twig. Its ripple pushed a lily pad away.</text>
+  <text x="20" y="753" font-size="13" fill="#9fb7b0">Predators move next turn. Click a spot inside the ring to hop.</text>
+  <text x="1180" y="753" font-size="12" text-anchor="end" fill="#6f8a84">Concept mock-up, not a screenshot</text>
+</svg>
