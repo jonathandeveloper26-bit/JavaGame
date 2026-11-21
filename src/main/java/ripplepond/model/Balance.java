@@ -11,8 +11,8 @@ public final class Balance {
     /** Width of the play area, in play-area units. */
     public static final double PLAY_AREA_WIDTH = 1;
 
-    /** Height of the play area: 0.667, so the area is 3:2. */
-    public static final double PLAY_AREA_HEIGHT = 0.667;
+    /** Height of the play area: 2/3, so the area is exactly 3:2. */
+    public static final double PLAY_AREA_HEIGHT = 2.0 / 3.0;
 
     /** Turns a ripple stays active. [proposed] */
     public static final int RIPPLE_LIFETIME_TURNS = 3;
