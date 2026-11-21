@@ -1,10 +1,15 @@
 # Ripple Pond - UML class diagram
 
-Version 1, 19 November 2026. Matches Draft 2 of the Game Design Document.
+Version 2, 20 November 2026. Matches Draft 3 of the Game Design Document.
 
 This file is the editable source of the class diagram. The diagrams are written in
 Mermaid, which GitHub, IntelliJ IDEA and VS Code (with a Mermaid extension) render
-directly. Edit the text between the code fences and the picture follows.
+directly. Edit the text between the code fences and the picture follows. When it
+changes, export a new PDF revision (`RIPPLE_POND_UML_REV_n.pdf`) and keep the old ones.
+
+All positions and sizes are in play-area widths: x runs from 0 to 1 and y from 0 to
+0.667, so a distance means the same in every direction. Every element is a circle and
+its size is its diameter (GDD section 2.1).
 
 The design is split into four views, because one picture of every class would be
 unreadable. A class can appear in more than one view; its members are listed only in
@@ -38,6 +43,7 @@ class Element {
   <<interface>>
   +getPosition() Vec2
   +getSize() double
+  +getRadius() double
   +touches(other: Element) boolean
   +distanceTo(other: Element) double
   +reactTo(ripple: Ripple, pond: Pond)
@@ -80,6 +86,9 @@ class Turtle {
   -awake: boolean
   #onRipple(ripple: Ripple, pond: Pond)
 }
+class Reed {
+  +liesBetween(from: Vec2, to: Vec2) boolean
+}
 class Predator {
   <<abstract>>
   -reach: double
@@ -115,6 +124,7 @@ AbstractElement *-- Vec2 : position
 AbstractElement <|-- Frog
 AbstractElement <|-- FloatingObject
 AbstractElement <|-- Turtle
+AbstractElement <|-- Reed
 AbstractElement <|-- Predator
 AbstractElement <|-- Pickup
 FloatingObject <|-- ThrownObject
@@ -134,10 +144,15 @@ Food <|-- Breadcrumb
 
 Notes:
 
-- `AbstractElement.reactTo` is the same for every element: it checks whether the ripple
-  reaches the element and, if so, calls `onRipple`. Subclasses only override `onRipple`.
-  A floating object is pushed, a turtle wakes and moves, everything else ignores it.
+- `getSize` is the diameter and `getRadius` half of it. `touches` is true when the
+  distance between centres is no more than the sum of the radii.
+- `AbstractElement.reactTo` is the same for every element: it asks the ripple whether
+  its ring passes the element this turn and, if so, calls `onRipple`. Subclasses only
+  override `onRipple`. A floating object is pushed, a turtle wakes and moves, everything
+  else ignores it.
 - `FloatingObject.push` moves its `rider` with it. This is the riding rule.
+- `Reed` is a solid clump that never moves. `liesBetween` answers whether the clump is
+  on the straight line between two points; the ripple uses it for the reed shadow rule.
 - `Snake`, `Bird` and `Fish` each answer `getDamage` and `canEnter` differently.
 - `Fly`, `Minnow` and `Breadcrumb` each implement `applyTo` (health, energy or both).
 
@@ -266,7 +281,6 @@ class LoseReason {
   <<enumeration>>
   NO_HEALTH
   NO_ENERGY
-  NO_MOVES
   TURN_LIMIT
 }
 class TurnAction {
@@ -289,6 +303,8 @@ class EndRules {
   +evaluate(level: Level) LevelState
 }
 class Pond {
+  +WIDTH$ double
+  +HEIGHT$ double
   -areas: List~Area~
   -elements: List~Element~
   -ripples: List~Ripple~
@@ -296,6 +312,7 @@ class Pond {
   +areaAt(point: Vec2) AreaType
   +isFree(point: Vec2, size: double) boolean
   +surfaceAt(point: Vec2) FloatingObject
+  +reedBetween(from: Vec2, to: Vec2) boolean
   +elementsInOrder() List~Element~
   +add(element: Element)
   +remove(element: Element)
@@ -309,22 +326,24 @@ class AreaType {
   <<enumeration>>
   START_BANK
   WATER
-  REEDS
   FAR_BANK
 }
 class Ripple {
   -source: Vec2
+  -origin: Element
   -radius: double
+  -previousRadius: double
   -turnsLeft: int
+  -alreadyPassed: Set~Element~
   +advance(pond: Pond)
-  +reaches(element: Element, pond: Pond) boolean
+  +passes(element: Element, pond: Pond) boolean
   +pushDirection(element: Element) Vec2
   +isFaded() boolean
 }
 class RippleSpread {
   <<interface>>
   +nextRadius(ripple: Ripple) double
-  +reaches(ripple: Ripple, element: Element, pond: Pond) boolean
+  +ringCrosses(ripple: Ripple, element: Element) boolean
 }
 class CircularSpread
 class ChaseStrategy {
@@ -365,7 +384,14 @@ Notes:
   every turn.
 - `Pond.elementsInOrder` returns elements top to bottom, then left to right, so the
   result is always the same for the same input.
-- `EndRules.evaluate` returns `Won`, `Lost` (with a reason) or `InProgress`.
+- `Pond.WIDTH` is 1 and `Pond.HEIGHT` is 0.667: the play area's fixed 3:2 shape.
+- `Ripple.passes` is true only in the turn the ring first reaches the element's nearest
+  edge (`RippleSpread.ringCrosses`, comparing `previousRadius` and `radius`), only if
+  `Pond.reedBetween` finds no reed clump on the line from the source, and only once per
+  element: the element is then recorded in `alreadyPassed`. It is never true for
+  `origin`, the thrown object that started the ripple.
+- `EndRules.evaluate` returns `Won`, `Lost` (with a reason) or `InProgress`. Win is
+  checked after the frog moves; health, energy and the turn limit after predators act.
 
 ## 4. Loading levels, events, views and controllers
 
@@ -413,19 +439,16 @@ class GameController {
   +reset()
   +nextLevel()
 }
-class ConsoleApp {
-  +run()
-}
-class ConsoleView {
-  +render(level: Level)
-  +onEvent(event: GameEvent)
-}
-class CommandParser {
-  +parse(line: String) TurnAction
-}
 class FxApp {
   +start(stage: Stage)
+  +showTitle()
+  +showLevel(level: Level)
+  +showLevelComplete(level: Level)
+  +showGameOver(level: Level)
 }
+class TitleScreen
+class LevelCompleteScreen
+class GameOverScreen
 class FxLevelView {
   +render(level: Level)
   +onEvent(event: GameEvent)
@@ -452,16 +475,15 @@ GameSession ..> LevelLoader : uses
 Level o-- PondListener : notifies
 PondListener ..> GameEvent
 GameEvent --> EventType
-PondListener <|.. ConsoleView
 PondListener <|.. FxLevelView
 GameController --> GameSession
 GameController --> Level
-ConsoleApp --> CommandParser
-ConsoleApp --> ConsoleView
-ConsoleApp --> GameController
-CommandParser ..> TurnAction : builds
 FxApp --> FxLevelView
 FxApp --> FxInputHandler
+FxApp --> TitleScreen
+FxApp --> LevelCompleteScreen
+FxApp --> GameOverScreen
+FxApp --> GameController
 FxInputHandler --> GameController
 FxInputHandler ..> TurnAction : builds
 ```
@@ -470,9 +492,15 @@ Notes:
 
 - `ElementFactory.create` turns a type name from the level file (`log`, `snake`, `fly`)
   into the right `Element` subclass. An unknown name becomes a `LevelFormatException`.
-- `FxLevelView.toPixels` and `toFraction` are the only place where fractions of the play
-  area become pixels and back.
-- Both views receive the same events, so the model does not know which one is running.
+- `FxLevelView.toPixels` and `toFraction` are the only place where play-area widths
+  become pixels and back. They use one scale factor for both axes, so the play area keeps
+  its 3:2 shape and a bigger window cannot change a distance in the game.
+- The model only knows the `PondListener` interface, never `FxLevelView`. Tests attach
+  their own listener to check which events a turn produced.
+- `TitleScreen`, `LevelCompleteScreen` and `GameOverScreen` are the simple screens of GDD
+  section 5. JavaFX is the only interface; the console version was dropped.
+- `GameController.reset` reloads the current level file. Undo is a stretch goal and is
+  not modelled.
 
 ## Design patterns and where to find them
 
@@ -481,18 +509,27 @@ Notes:
 | Template method | `AbstractElement.reactTo` calling `onRipple`; `Food.collect` calling `applyTo`; `TurnEngine.runTurn` calling its five steps | The fixed part is written once; each subclass fills in only its own step |
 | Strategy | `MoveMode` (Walk, Hop, Swim); `RippleSpread` (CircularSpread); `ChaseStrategy` (StraightLineChase) | A rule can be swapped or added without touching the class that uses it |
 | Factory | `ElementFactory`, used by `LevelLoader` | Level files name types as text; one place maps names to classes |
-| Observer | `PondListener`, `GameEvent`, `Level.addListener` and `publish` | The model stays free of any view code; console and JavaFX listen the same way |
+| Observer | `PondListener`, `GameEvent`, `Level.addListener` and `publish` | The model stays free of any view code; the JavaFX view and the tests listen the same way |
 | State | `LevelState` (InProgress, Won, Lost) | A finished level cannot accept turns, with no `if` chains in `Level` |
 
 ## Where this differs from the GDD, and what is still open
 
-- The GDD lists `Level` among the shared interfaces. Here it is a class, because there
-  is only one kind of level. `Element` and `PondListener` are interfaces as planned.
 - `ThrowableKind` uses the placeholder names twig, plank and log (GDD section 10).
-- `ConsoleApp`, `ConsoleView` and `CommandParser` only stay if the console version does
-  (GDD section 10).
 - `StraightLineChase` is the simple rule proposed in the GDD. A smarter rule that goes
-  around reeds would be a second `ChaseStrategy`, with no change to `Predator`.
-- Undo is not modelled, because the team has not decided whether it is core.
+  around reed clumps would be a second `ChaseStrategy`, with no change to `Predator`.
+- Undo is a stretch goal and is not modelled. If it is built, a turn's changes could be
+  recorded as commands that can be reversed, without changing the classes above.
 - Method lists show the operations that matter for the design. Getters, setters and
   constructors are left out.
+
+Changed since version 1, to match Draft 3 of the GDD:
+
+- Reed clumps are a `Reed` element instead of an area type; `AreaType` lost `REEDS`.
+- `Ripple.reaches` became `passes`, which is true once per element, when the ring passes
+  it. `Pond.reedBetween` supports the reed shadow rule.
+- `LoseReason` lost `NO_MOVES`: a level is lost only on health, energy or the turn limit.
+- `Pond.WIDTH` and `HEIGHT` fix the play area's 3:2 shape; `Element.getRadius` added.
+- The console classes (`ConsoleApp`, `ConsoleView`, `CommandParser`) are removed. The
+  title, level complete and game over screens are added.
+- `Level` is now listed in the GDD as a shared class, not an interface, so the two
+  documents agree.
