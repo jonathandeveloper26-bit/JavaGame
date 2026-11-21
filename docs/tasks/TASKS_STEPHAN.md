@@ -3,9 +3,9 @@
 Ripple Pond, Saturday 21 to Saturday 28 November 2026.
 Load: full. Role: team lead and integrator.
 
-Read first: GDD Draft 3 sections 2.1, 3, 8 and 9, and the UML views 3 and 4. Task IDs
-starting with J are Jonathan's (`TASKS_JONATHAN.md`) and Z are Zaryab's
-(`TASKS_ZARYAB.md`).
+Read first: GDD (`docs/RIPPLE_POND_GDD.md`) sections 2.1, 3, 8 and 9, and the UML views 3 and 4. Task IDs
+starting with J are Jonathan's (`TASKS_JONATHAN.md`) and X are Xaryab's
+(`TASKS_XARYAB.md`).
 
 ## How we work
 
@@ -76,7 +76,7 @@ team. **Reviewer:** Jonathan.
 
 ### S2. Shared types
 
-**Due:** Sat 21 Nov, end of day. **Needs:** S1. **Blocks:** J2, J3, J4, Z1.
+**Due:** Sat 21 Nov, end of day. **Needs:** S1. **Blocks:** J2, J3, J4, X1.
 **Reviewer:** Jonathan.
 
 1. `Vec2`, fully implemented and tested: immutable, with `plus`, `minus`, `scale`,
@@ -173,21 +173,21 @@ tested.
 
 ### S7. JavaFX screen switching
 
-**Due:** Mon 23 Nov, 12:00. **Needs:** S1. **Blocks:** Z2. **Reviewer:** Jonathan.
+**Due:** Mon 23 Nov, 12:00. **Needs:** S1. **Blocks:** X2. **Reviewer:** Jonathan.
 
 1. `FxApp` with `showTitle`, `showLevel`, `showLevelComplete` and `showGameOver`, each
    switching the window's scene.
-2. Placeholder `TitleScreen`, `LevelCompleteScreen` and `GameOverScreen` that Zaryab
-   replaces in Z2, and a placeholder level screen.
+2. Placeholder `TitleScreen`, `LevelCompleteScreen` and `GameOverScreen` that Xaryab
+   replaces in X2, and a placeholder level screen.
 3. Esc quits from any screen.
 
-**Done when:** the four placeholder screens can be reached with buttons. Tell Zaryab
+**Done when:** the four placeholder screens can be reached with buttons. Tell Xaryab
 when it is merged.
 
 ### S8. Level screen and input
 
 **Due:** Tue 24 Nov, end of day. **Needs:** S5, S7, J7 (`GameController`, due Tue 24,
-12:00). **Blocks:** J9, Z5, S9. **GDD:** 5. **Reviewer:** Jonathan.
+12:00). **Blocks:** J9, X5, S9. **GDD:** 5. **Reviewer:** Jonathan.
 
 1. `FxLevelView.render`: draw the banks, water and every element as simple coloured
    circles at their positions and sizes.
@@ -207,7 +207,7 @@ when it is merged.
 ### S9. Levels 3 and 4, and the animated river
 
 **Due:** levels Wed 25 Nov, 12:00; river animation Wed 25 Nov, end of day.
-**Needs:** J1, J5, S8. **Blocks:** Z5. **Reviewer:** Jonathan for the river, Zaryab
+**Needs:** J1, J5, S8. **Blocks:** X5. **Reviewer:** Jonathan for the river, Xaryab
 plays the levels.
 
 1. Level 3 introduces predators: one snake on the far bank and one fish [proposed].
@@ -220,9 +220,9 @@ plays the levels.
 
 ### S10. Balancing session
 
-**When:** Wed 25 Nov, 19:00, all three. **Needs:** Z5's playtest notes.
+**When:** Wed 25 Nov, 19:00, all three. **Needs:** X5's playtest notes.
 
-1. Go through Zaryab's notes level by level.
+1. Go through Xaryab's notes level by level.
 2. Change numbers only in `Balance` and the level files; merge the changes that evening.
 
 ### S11. Feature freeze
@@ -256,4 +256,4 @@ plays the levels.
 ## Every day
 
 - Merge reviewed pull requests and keep `main` building and green.
-- Review Jonathan's pull requests and Zaryab's screens (Z2) within 12 hours.
+- Review Jonathan's pull requests and Xaryab's screens (X2) within 12 hours.

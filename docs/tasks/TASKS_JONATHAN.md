@@ -4,9 +4,9 @@ Ripple Pond, Saturday 21 to Saturday 28 November 2026.
 Load: full. Role: the frog and everything it uses, level files, and the design
 documents.
 
-Read first: GDD Draft 3 sections 2, 3.2, 4, 8 and 9, and UML views 1, 2 and 4. Task IDs
-starting with S are Stephan's (`TASKS_STEPHAN.md`) and Z are Zaryab's
-(`TASKS_ZARYAB.md`).
+Read first: GDD (`docs/RIPPLE_POND_GDD.md`) sections 2, 3.2, 4, 8 and 9, and UML views 1, 2 and 4. Task IDs
+starting with S are Stephan's (`TASKS_STEPHAN.md`) and X are Xaryab's
+(`TASKS_XARYAB.md`).
 
 ## How we work
 
@@ -54,8 +54,8 @@ either slips, say so on Sunday evening so the team can move work.
 
 ### J1. Level file format
 
-**Due:** Sat 21 Nov, 12:00. **Needs:** nothing (no code). **Blocks:** J5, S9, Z4.
-**Reviewers:** Stephan and Zaryab, who both write levels.
+**Due:** Sat 21 Nov, 12:00. **Needs:** nothing (no code). **Blocks:** J5, S9, X4.
+**Reviewers:** Stephan and Xaryab, who both write levels.
 
 1. Write `docs/LEVEL_FORMAT.md`: one line per item, a keyword first, then numbers in
    play-area widths (x from 0 to 1, y from 0 to 0.667). For example `frog 0.50 0.62`,
@@ -71,7 +71,7 @@ either slips, say so on Sunday evening so the team can move work.
 ### J2. Element hierarchy and frog health and energy
 
 **Due:** `Reed` Sun 22 Nov, 12:00; everything else Sun 22 Nov, end of day.
-**Needs:** S2. **Blocks:** S3 (needs `Reed` first), J3, J4, J6, J8, Z1.
+**Needs:** S2. **Blocks:** S3 (needs `Reed` first), J3, J4, J6, J8, X1.
 **GDD:** 2.1 to 2.3, 4.1. **Reviewer:** Stephan.
 
 1. `Reed` first: a solid circle that never moves, with `liesBetween(from, to)` true when
@@ -87,7 +87,7 @@ either slips, say so on Sunday evening so the team can move work.
    that moves the rider with it. Leave blocking for J8.
 5. `ThrownObject` with `ThrowableKind` (twig 0.05, plank 0.10, log 0.18), and `LilyPad`.
 6. `Turtle` with an `awake` flag; its ripple reaction comes in J8.
-7. `Pickup`: abstract, with `collect(frog, level)`. Zaryab's food builds on it.
+7. `Pickup`: abstract, with `collect(frog, level)`. Xaryab's food builds on it.
 8. Tests for every rule above, especially the clamps and the riding rule.
 
 **Done when:** every class in UML view 1 except predators and food exists and is
@@ -120,13 +120,13 @@ tested.
 
 ### J5. Level loader and element factory
 
-**Due:** Mon 23 Nov, end of day. **Needs:** J1, J2, S3. **Blocks:** J7, J9, S9, Z4.
+**Due:** Mon 23 Nov, end of day. **Needs:** J1, J2, S3. **Blocks:** J7, J9, S9, X4.
 **GDD:** 2.6. **Reviewer:** Stephan.
 
 1. `ElementFactory.create(typeName, position, size)`: a map from names such as `log` or
    `lilypad` to the right class. An unknown name throws `LevelFormatException`.
 2. Each author adds their own names when their classes land: Stephan adds `snake`,
-   `bird` and `fish` (S6); Zaryab adds `fly`, `minnow` and `breadcrumb` (Z1).
+   `bird` and `fish` (S6); Xaryab adds `fly`, `minnow` and `breadcrumb` (X1).
 3. `LevelLoader.load(path, progress)`: read the file, build the `Pond`, the frog with
    full health and energy for its rank, the `ThrowBag` and the turn limit, and return a
    `Level`.
@@ -156,7 +156,7 @@ tested.
 
 ### J7. Experience, game session and controller
 
-**Due:** Tue 24 Nov, 12:00. **Needs:** J5. **Blocks:** S8, Z2.
+**Due:** Tue 24 Nov, 12:00. **Needs:** J5. **Blocks:** S8, X2.
 **GDD:** 4.3, 4.5, 4.6. **Reviewer:** Stephan.
 
 1. `Rank` holding the table in GDD section 4.3 as data, with `forXp`.
@@ -165,7 +165,7 @@ tested.
    `startLevel` builds a fresh frog for the current rank, `completeLevel` awards XP and
    publishes `RANK_GAINED` when the rank goes up.
 4. `GameController`: `submit`, `reset` (reloads the level file and keeps XP) and
-   `nextLevel`. Stephan's input handler and Zaryab's screens call it.
+   `nextLevel`. Stephan's input handler and Xaryab's screens call it.
 5. Tests: the XP formula, every rank boundary, unlocking in order, reset restores the
    level as loaded and keeps XP.
 
@@ -187,8 +187,8 @@ change.
 
 ### J9. Levels 1 and 2
 
-**Due:** Wed 25 Nov, 12:00. **Needs:** J5, S8. **Blocks:** Z5.
-**Reviewer:** Zaryab plays them.
+**Due:** Wed 25 Nov, 12:00. **Needs:** J5, S8. **Blocks:** X5.
+**Reviewer:** Xaryab plays them.
 
 1. Level 1 teaches throwing and hopping: no predators, a generous bag [proposed].
 2. Level 2 adds lily pads, a turtle and a fly [proposed].
@@ -196,7 +196,7 @@ change.
 
 ### J10. Balancing session
 
-**When:** Wed 25 Nov, 19:00, all three. **Needs:** Z5's playtest notes.
+**When:** Wed 25 Nov, 19:00, all three. **Needs:** X5's playtest notes.
 
 1. Change numbers only in `Balance` and the level files.
 2. Afterwards, update the numbers in the GDD to match.
@@ -233,4 +233,4 @@ change.
 
 ## Every day
 
-- Review Stephan's pull requests and Zaryab's food (Z1) within 12 hours.
+- Review Stephan's pull requests and Xaryab's food (X1) within 12 hours.

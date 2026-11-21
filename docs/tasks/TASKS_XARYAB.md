@@ -1,9 +1,9 @@
-# Tasks - Zaryab
+# Tasks - Xaryab
 
 Ripple Pond, Saturday 21 to Saturday 28 November 2026.
 Load: light, about 10 hours in total. Each task shows its estimated time.
 
-Read first: GDD Draft 3 sections 2.5, 5, 8.2 and 9.3. Task IDs starting with S are
+Read first: GDD (`docs/RIPPLE_POND_GDD.md`) sections 2.5, 5, 8.2 and 9.3. Task IDs starting with S are
 Stephan's (`TASKS_STEPHAN.md`) and J are Jonathan's (`TASKS_JONATHAN.md`).
 
 None of your tasks blocks anyone else, so a late task does not stop the team. Still,
@@ -12,7 +12,7 @@ say so the same day if you will be late.
 ## How we work
 
 - **Due** means merged into `main` by that time. "End of day" means 22:00.
-- One branch and one pull request per task, named like `zaryab/z1-food`.
+- One branch and one pull request per task, named like `xaryab/z1-food`.
 - A pull request is the classes, their unit tests and their Javadoc together, with CI
   green. It is checked against the principles in GDD section 8.2.
 - Every pull request is reviewed by one teammate before it is merged. Reviews are done
@@ -44,7 +44,7 @@ say so the same day if you will be late.
 
 ## Tasks
 
-### Z0. Get set up (0.5 hour)
+### X0. Get set up (0.5 hour)
 
 **Due:** Sun 22 Nov, 12:00. **Needs:** S1 (Sat 21, 12:00) and J1 (Sat 21, 12:00).
 
@@ -53,7 +53,7 @@ say so the same day if you will be late.
 3. Review J1: comment on the level format pull request with anything unclear to you as
    a level writer.
 
-### Z1. Food (2.5 hours)
+### X1. Food (2.5 hours)
 
 **Due:** Mon 23 Nov, end of day. **Needs:** J2 (`Pickup` and `Frog`, Sun 22).
 **GDD:** 2.5. **Reviewer:** Jonathan.
@@ -70,12 +70,12 @@ say so the same day if you will be late.
 
 **Done when:** the three foods work in a test level.
 
-### Z2. Title, level complete and game over screens (3 hours)
+### X2. Title, level complete and game over screens (3 hours)
 
 **Due:** Wed 25 Nov, 12:00. **Needs:** S7 (screen switching, Mon 23, 12:00); J7
 (`GameSession` data, Tue 24, 12:00). **GDD:** 5. **Reviewer:** Stephan.
 
-1. `TitleScreen`: **Play**, **How to Play** (shows the text from Z3) and **Quit**.
+1. `TitleScreen`: **Play**, **How to Play** (shows the text from X3) and **Quit**.
 2. `LevelCompleteScreen`: turns used, health and energy left, XP gained, the new rank
    if there is one, and **Next level**.
 3. `GameOverScreen`: why the level was lost (health, energy or turn limit), **Retry**
@@ -87,7 +87,7 @@ say so the same day if you will be late.
 **Done when:** you can go from the title screen to a level and back through both end
 screens.
 
-### Z3. How to Play text (0.5 hour)
+### X3. How to Play text (0.5 hour)
 
 **Due:** Tue 24 Nov, end of day. **Needs:** nothing. **GDD:** 3, 4.2, 5.
 
@@ -95,7 +95,7 @@ screens.
    hop and swim and their costs, and how to win and lose. At most 15 short lines.
 2. Use the same text for the How to Play section of the README if it helps.
 
-### Z4. Level 5 (1 hour)
+### X4. Level 5 (1 hour)
 
 **Due:** Wed 25 Nov, 12:00. **Needs:** J1, J5 (loader, Mon 23). **GDD:** 2.6.
 **Reviewer:** Jonathan.
@@ -107,9 +107,9 @@ screens.
 3. Win it yourself with its starting bag before merging. If the level screen (S8) is
    not ready, ask Jonathan for a test that loads it.
 
-### Z5. Playtest all five levels (1.5 hours)
+### X5. Playtest all five levels (1.5 hours)
 
-**When:** Wed 25 Nov, 14:00 to 18:00. **Needs:** S8, J9, S9, Z4.
+**When:** Wed 25 Nov, 14:00 to 18:00. **Needs:** S8, J9, S9, X4.
 
 1. Play levels 1 to 5 in order from the title screen.
 2. For each level, note in `docs/PLAYTEST_NOTES.md`: won or lost, turns used, health
@@ -117,13 +117,13 @@ screens.
    with the steps to reproduce it.
 3. Merge the notes by 18:00. They are the agenda for the balancing session.
 
-### Z6. Balancing session (0.5 hour)
+### X6. Balancing session (0.5 hour)
 
 **When:** Wed 25 Nov, 19:00, all three.
 
 1. Walk the team through your notes, level by level.
 
-### Z7. Final README (0.5 hour)
+### X7. Final README (0.5 hour)
 
 **Due:** Thu 26 Nov, 18:00. **Reviewer:** Jonathan.
 
@@ -131,7 +131,7 @@ screens.
    table and the milestones.
 2. Replace the mock-up with a real screenshot of the level screen, or add one next to it.
 
-### Z8. Rehearsal (0.5 hour)
+### X8. Rehearsal (0.5 hour)
 
 **When:** Fri 27 Nov.
 
