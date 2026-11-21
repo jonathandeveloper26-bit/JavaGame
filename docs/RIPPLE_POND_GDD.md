@@ -2,14 +2,16 @@
 
 | Field | Value |
 | --- | --- |
-| Status | Draft 4, for review by the whole team |
+| Status | Draft 5, for review by the whole team |
 | Date | 20 November 2026 |
 | Delivery | 28 November 2026 |
-| Team | Stephan (lead), Jonathan, Zaryab |
+| Team | Stephan (lead), Jonathan, Xaryab |
 | Platform | Desktop, Java 21 with JavaFX |
 | Core technology | Maven, JUnit 5, JaCoCo, Javadoc, GitHub Actions |
 
 **How to read this draft.** This file is the editable source of the Game Design Document. Design choices come from the team's discussions. Anything marked **[proposed]** is a default filled in to make the document complete; the team has not decided it yet. All numbers are starting values for balancing, not tested ones.
+
+**What changed in Draft 5.** The third team member's name is corrected to Xaryab, and his task list is now `docs/tasks/TASKS_XARYAB.md`. Nothing else changed.
 
 **What changed in Draft 4.** Work starts on 21 November, so the milestones are re-planned from that date (section 9.4), and each member has a step-by-step task list with due dates in `docs/tasks/`. Section 9.2 gives an owner to a few classes the task lists needed: `Pickup`, `LevelState`, `GameController`, `Food` and a new `Balance` class that holds every tunable number (section 8.1). The game rules are unchanged.
 
@@ -322,7 +324,7 @@ Status: first proposed by Stephan for Draft 1. The systems added in Draft 2 were
 | --- | --- | --- |
 | Stephan | Full | Geometry, ripple engine and turn loop, predators, plus the application window and level screen. Team lead and integrator. |
 | Jonathan | Full | The frog and what it uses: health, energy, movement, experience and ranks; thrown objects, lily pads, turtles and reed clumps; the level loader and the level file format. |
-| Zaryab | Light, about 10 hours | The title, level complete and game over screens; the three food items; level 5; playtesting all five levels; the README and How to Play text. |
+| Xaryab | Light, about 10 hours | The title, level complete and game over screens; the three food items; level 5; playtesting all five levels; the README and How to Play text. |
 
 ### 9.2 Ownership by layer
 
@@ -332,14 +334,14 @@ Status: first proposed by Stephan for Draft 1. The systems added in Draft 2 were
 | Foundations (due 22 November) | Jonathan | Element hierarchy (Frog, thrown objects, LilyPad, Turtle, Reed, the `Pickup` base class), frog health and energy, the throw bag, level states and win and lose checks. |
 | Content (shared) | Jonathan | Level file format, LevelLoader and ElementFactory, walking, hopping and swimming with energy by distance, riding, throwable icons, experience and ranks, the game session and `GameController` (reset, next level), turtle wake and move, pad push rules, levels 1 and 2. |
 | Content (shared) | Stephan | Circular ripples, fade and reed shadow, predators (snake, bird, fish: chase and attack), JavaFX screen switching, level screen and input, the animated river, levels 3 and 4. |
-| Content (shared) | Zaryab | Title, level complete and game over screens; the `Food` base class and food (fly, small minnow, breadcrumb); level 5; playtest notes on all five levels. |
+| Content (shared) | Xaryab | Title, level complete and game over screens; the `Food` base class and food (fly, small minnow, breadcrumb); level 5; playtest notes on all five levels. |
 | One-off jobs | Stephan | Maven project, CI and coverage, integration of daily merges, JavaFX window. |
 | One-off jobs | Jonathan | GDD and UML revisions and their PDFs, Javadoc check, `CREDITS.md`. |
-| One-off jobs | Zaryab | README, How to Play text, level design review. |
+| One-off jobs | Xaryab | README, How to Play text, level design review. |
 | Balancing | All three | Turn limit, throw bags, ripple strength, health, energy, damage, food and XP numbers, 25 November. |
 | Presentation slides | To decide | Each member prepares their own part; who assembles the slides is open (section 10.1). |
 
-Each member's tasks, step by step and with due dates, are in `docs/tasks/TASKS_STEPHAN.md`, `TASKS_JONATHAN.md` and `TASKS_ZARYAB.md`.
+Each member's tasks, step by step and with due dates, are in `docs/tasks/TASKS_STEPHAN.md`, `TASKS_JONATHAN.md` and `TASKS_XARYAB.md`.
 
 ### 9.3 Working rules
 
@@ -395,8 +397,8 @@ Without a console version, the turn loop can only be played once JavaFX accepts 
 - **Losing.** Only health at 0, energy at 0 or the turn limit lose a level. Having nothing left to throw does not (section 3.2).
 - **Turn limit.** Kept, so every level ends (section 3.2).
 - **Reset and undo.** Reset is core; undo is a stretch goal (section 4.5).
-- **Console.** Dropped. JavaFX is the only interface. Zaryab takes the title, level complete and game over screens instead (sections 7.3 and 9).
-- **Levels.** Jonathan makes levels 1 and 2, Stephan 3 and 4, Zaryab 5; Zaryab playtests all five (section 9.2).
+- **Console.** Dropped. JavaFX is the only interface. Xaryab takes the title, level complete and game over screens instead (sections 7.3 and 9).
+- **Levels.** Jonathan makes levels 1 and 2, Stephan 3 and 4, Xaryab 5; Xaryab playtests all five (section 9.2).
 - **Reeds.** Round clumps placed in the river as elements, not rectangular areas (section 2.3).
 - **AI assistance.** The team writes the code with AI assistance, and every member can explain every line they merge (section 9.3).
 - **`Level` is a class.** There is only one kind of level, so it is a class, not one of the shared interfaces (section 9.2).

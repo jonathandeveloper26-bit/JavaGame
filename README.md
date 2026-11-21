@@ -20,7 +20,7 @@ repository holds the design documents only. Delivery is on 28 November 2026.
 
 | Deliverable | State |
 | --- | --- |
-| Game Design Document | Draft 4, under team review |
+| Game Design Document | Draft 5, under team review |
 | Task lists with due dates | Written, waiting for the team to confirm |
 | UML class diagram | Version 2 |
 | Maven project, CI, coverage | Not in the repository yet |
@@ -156,13 +156,13 @@ The full design, in four views, is in the
 | Document | File |
 | --- | --- |
 | Game Design Document, editable source | [docs/RIPPLE_POND_GDD.md](docs/RIPPLE_POND_GDD.md) |
-| Game Design Document, Draft 4, PDF | [docs/RIPPLE_POND_GDD_REV_4.pdf](docs/RIPPLE_POND_GDD_REV_4.pdf) |
+| Game Design Document, Draft 5, PDF | [docs/RIPPLE_POND_GDD_REV_5.pdf](docs/RIPPLE_POND_GDD_REV_5.pdf) |
 | UML class diagram, editable source | [docs/RIPPLE_POND_UML.md](docs/RIPPLE_POND_UML.md) |
 | UML class diagram, version 2, PDF | [docs/RIPPLE_POND_UML_REV_2.pdf](docs/RIPPLE_POND_UML_REV_2.pdf) |
 | Level screen mock-up | [docs/RIPPLE_POND_MOCKUP.png](docs/RIPPLE_POND_MOCKUP.png) |
 | Stephan's tasks | [docs/tasks/TASKS_STEPHAN.md](docs/tasks/TASKS_STEPHAN.md) |
 | Jonathan's tasks | [docs/tasks/TASKS_JONATHAN.md](docs/tasks/TASKS_JONATHAN.md) |
-| Zaryab's tasks | [docs/tasks/TASKS_ZARYAB.md](docs/tasks/TASKS_ZARYAB.md) |
+| Xaryab's tasks | [docs/tasks/TASKS_XARYAB.md](docs/tasks/TASKS_XARYAB.md) |
 
 Edit the Markdown sources, never the PDFs. When a design change produces a new PDF, the
 old one is kept and the new one gets the next revision suffix, for example `_REV_3`.
@@ -195,7 +195,7 @@ confirm.
 | --- | --- | --- |
 | Stephan (lead) | Full | Geometry, ripple engine and turn loop, predators, the JavaFX window and level screen, levels 3 and 4, Maven and CI, integration |
 | Jonathan | Full | The frog (health, energy, movement, experience and ranks), thrown objects, lily pads, turtles and reed clumps, level states, the level loader and file format, the game session and reset, levels 1 and 2, GDD and UML |
-| Zaryab | Light | The title, level complete and game over screens, food, level 5, playtesting all levels, this README and the How to Play text |
+| Xaryab | Light | The title, level complete and game over screens, food, level 5, playtesting all levels, this README and the How to Play text |
 
 ### Working rules
 
