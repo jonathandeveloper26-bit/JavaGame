@@ -25,4 +25,13 @@ public final class Balance {
 
     /** Diameter of the frog, in play-area widths. [proposed] */
     public static final double FROG_SIZE = 0.04;
+
+    /** Diameter of a thrown twig, in play-area widths. [proposed] */
+    public static final double TWIG_SIZE = 0.05;
+
+    /** Diameter of a thrown plank, in play-area widths. [proposed] */
+    public static final double PLANK_SIZE = 0.10;
+
+    /** Diameter of a thrown log, in play-area widths. [proposed] */
+    public static final double LOG_SIZE = 0.18;
 }
