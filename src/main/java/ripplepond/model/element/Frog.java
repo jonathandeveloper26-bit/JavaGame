@@ -16,8 +16,7 @@ import ripplepond.model.progress.Rank;
  * moves cost energy by distance (GDD section 4.2).
  * <p>
  * A new frog is created for each level, so health and energy are full at the start of
- * every level. Moving the frog comes in J6, and riding a floating object in the next
- * step.
+ * every level. Moving the frog comes in J6.
  */
 public final class Frog extends AbstractElement {
 
@@ -141,6 +140,31 @@ public final class Frog extends AbstractElement {
      */
     public Optional<FloatingObject> standingOn() {
         return Optional.ofNullable(standingOn);
+    }
+
+    /**
+     * Puts the frog on a floating object, or takes it off the one it is on.
+     * <p>
+     * This is the only place the link between the frog and its object changes. It
+     * updates both sides at once: the old object loses its rider and the new one gains
+     * it. The frog does not move; the caller places it first. Only code in this package
+     * calls it: moving the frog (J6) and the tests.
+     *
+     * @param surface the object the frog now stands on, or {@code null} for none
+     * @throws IllegalArgumentException if {@code surface} does not cover the frog's
+     *                                  centre
+     */
+    void standOn(FloatingObject surface) {
+        if (surface != null && !surface.covers(getPosition())) {
+            throw new IllegalArgumentException("the frog is not on that object");
+        }
+        if (standingOn != null) {
+            standingOn.setRider(null);
+        }
+        standingOn = surface;
+        if (surface != null) {
+            surface.setRider(this);
+        }
     }
 
     private static void requireNotNegative(double amount) {
