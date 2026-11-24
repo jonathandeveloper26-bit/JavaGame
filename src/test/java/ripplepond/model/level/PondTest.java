@@ -14,14 +14,23 @@ import ripplepond.model.element.Element;
 import ripplepond.model.element.Frog;
 import ripplepond.model.element.Reed;
 import ripplepond.model.geometry.Vec2;
+import ripplepond.model.progress.Rank;
 
 class PondTest {
 
     private static final double HEIGHT = 2.0 / 3.0;
     private static final double BANK = 0.1;
 
+    /**
+     * A frog for the pond's constructor, in the top-left corner. Pond does not check
+     * the frog's position yet (isFree's frog check waits on J2 being wired in).
+     */
+    private static Frog frog() {
+        return new Frog(new Vec2(0, 0), Rank.RANK_1);
+    }
+
     private static Pond pond() {
-        return new Pond(1, HEIGHT, BANK, BANK, new Frog());
+        return new Pond(1, HEIGHT, BANK, BANK, frog());
     }
 
     private static Reed reedAt(double x, double y) {
@@ -44,7 +53,7 @@ class PondTest {
     @Test
     void constructorRejectsOverlappingBanks() {
         assertThrows(IllegalArgumentException.class,
-                () -> new Pond(1, HEIGHT, 0.4, 0.4, new Frog()));
+                () -> new Pond(1, HEIGHT, 0.4, 0.4, frog()));
     }
 
     @Test
@@ -146,14 +155,14 @@ class PondTest {
 
     @Test
     void pondWithoutBanksIsAllWater() {
-        Pond pond = new Pond(1, HEIGHT, new Frog());
+        Pond pond = new Pond(1, HEIGHT, frog());
         assertEquals(AreaType.WATER, pond.areaAt(new Vec2(0.5, 0)));
         assertEquals(AreaType.WATER, pond.areaAt(new Vec2(0.5, HEIGHT)));
     }
 
     @Test
     void zeroDepthStartBankLeavesTheBottomEdgeInTheWater() {
-        Pond pond = new Pond(1, HEIGHT, BANK, 0, new Frog());
+        Pond pond = new Pond(1, HEIGHT, BANK, 0, frog());
         assertEquals(AreaType.WATER, pond.areaAt(new Vec2(0.5, HEIGHT)));
     }
 }
