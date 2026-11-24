@@ -1,10 +1,11 @@
 # Level 2 - Pads and a sleeper
-# Owner: Jonathan (J9). Adds lily pads, a turtle and an icon (and a fly, once food exists).
+# Owner: Jonathan (J9). Adds lily pads, a turtle, an icon and a fly.
 #
 # Pad A is a hop from the start bank and carries a plank icon. Pad B is 0.17 beyond it:
 # too far to hop. The trick is to throw a twig on B's far side, so the ripple pushes B
 # 0.08 towards A. The sleeping turtle beside the route wakes when the ripples reach it
-# and moves out of the way. Designed for a rank 1 frog (hop 0.10).
+# and moves out of the way. The fly is off the route: a bonus worth a detour from pad B.
+# Designed for a rank 1 frog (hop 0.10).
 #
 # One way to win (LevelsTest plays it): throw a twig at (0.50, 0.215) and walk to the
 # edge; hop to A; throw a twig at (0.50, 0.295) and hop to B; hop to each twig in turn;
@@ -19,6 +20,6 @@ lilypad 0.50 0.47 0.08     # pad A: one hop from the bank
 lilypad 0.50 0.30 0.08     # pad B: push it towards A
 turtle  0.62 0.30 0.07     # asleep beside the route
 icon plank 0.50 0.47       # on pad A
-# fly 0.40 0.40            # add once Xaryab's food (X1) is in the factory
+fly     0.40 0.40          # off the route: +2 HP, +4 energy
 
 bag twig 3

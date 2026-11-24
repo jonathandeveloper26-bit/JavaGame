@@ -12,6 +12,7 @@ import ripplepond.model.element.Frog;
 import ripplepond.model.element.LilyPad;
 import ripplepond.model.element.ThrowableKind;
 import ripplepond.model.element.Turtle;
+import ripplepond.model.element.pickup.Fly;
 import ripplepond.model.element.pickup.ThrowableIcon;
 import ripplepond.model.geometry.Vec2;
 import ripplepond.model.level.InProgress;
@@ -112,7 +113,7 @@ class LevelsTest {
     }
 
     @Test
-    void levelTwoLoadsWithPadsATurtleAndAnIcon() throws LevelFormatException {
+    void levelTwoLoadsWithPadsATurtleAnIconAndAFly() throws LevelFormatException {
         Level level = loader.load("levels/level2.txt", Rank.RANK_1);
 
         assertEquals(20, level.getTurnLimit());
@@ -120,6 +121,7 @@ class LevelsTest {
         assertEquals(2, level.getPond().elementsInOrder().stream().filter(LilyPad.class::isInstance).count());
         assertEquals(1, level.getPond().elementsInOrder().stream().filter(Turtle.class::isInstance).count());
         assertEquals(1, level.getPond().elementsInOrder().stream().filter(ThrowableIcon.class::isInstance).count());
+        assertEquals(1, level.getPond().elementsInOrder().stream().filter(Fly.class::isInstance).count());
     }
 
     @Test
