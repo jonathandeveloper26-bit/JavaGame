@@ -15,6 +15,9 @@ import ripplepond.model.element.Reed;
 import ripplepond.model.element.ThrowableKind;
 import ripplepond.model.element.ThrownObject;
 import ripplepond.model.element.Turtle;
+import ripplepond.model.element.pickup.Breadcrumb;
+import ripplepond.model.element.pickup.Fly;
+import ripplepond.model.element.pickup.Minnow;
 import ripplepond.model.geometry.Vec2;
 
 /**
@@ -44,6 +47,9 @@ class ElementFactoryTest {
         assertInstanceOf(LilyPad.class, factory.create("lilypad", AT, 0.125));
         assertInstanceOf(Turtle.class, factory.create("turtle", AT, 0.125));
         assertInstanceOf(Reed.class, factory.create("reed", AT, 0.125));
+        assertInstanceOf(Fly.class, factory.create("fly", AT, 0.125));
+        assertInstanceOf(Minnow.class, factory.create("minnow", AT, 0.125));
+        assertInstanceOf(Breadcrumb.class, factory.create("breadcrumb", AT, 0.125));
     }
 
     @Test
@@ -62,6 +68,9 @@ class ElementFactoryTest {
         assertEquals(0.08, factory.defaultSize("lilypad"), DELTA);
         assertEquals(0.07, factory.defaultSize("turtle"), DELTA);
         assertEquals(0.10, factory.defaultSize("reed"), DELTA);
+        assertEquals(0.025, factory.defaultSize("fly"), DELTA);
+        assertEquals(0.03, factory.defaultSize("minnow"), DELTA);
+        assertEquals(0.025, factory.defaultSize("breadcrumb"), DELTA);
     }
 
     @Test
@@ -83,7 +92,7 @@ class ElementFactoryTest {
     @Test
     void typesNotWrittenYetAreUnknown() {
         assertTrue(factory.knows("reed"));
-        assertFalse(factory.knows("fly"));
+        assertTrue(factory.knows("fly"));
         assertFalse(factory.knows("snake"));
         assertFalse(factory.knows("icon"));
     }
