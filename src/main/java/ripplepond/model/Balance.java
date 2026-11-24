@@ -47,6 +47,9 @@ public final class Balance {
     /** Default diameter of a reed clump in a level file, in play-area widths. [proposed] */
     public static final double REED_SIZE = 0.10;
 
+    /** Default diameter of a throwable icon in a level file, in play-area widths. [proposed] */
+    public static final double ICON_SIZE = 0.04;
+
     /** Moves are charged per this distance travelled, in play-area widths (GDD 4.2). [proposed] */
     public static final double MOVE_UNIT = 0.10;
 

@@ -17,6 +17,7 @@ import ripplepond.model.element.LilyPad;
 import ripplepond.model.element.Reed;
 import ripplepond.model.element.ThrowableKind;
 import ripplepond.model.element.Turtle;
+import ripplepond.model.element.pickup.ThrowableIcon;
 import ripplepond.model.geometry.Vec2;
 import ripplepond.model.level.AreaType;
 import ripplepond.model.level.InProgress;
@@ -106,14 +107,16 @@ class LevelLoaderTest {
     void everyElementIsAddedWithItsTypePositionAndSize() throws LevelFormatException {
         List<Element> elements = loader.load("levels/valid.txt", Rank.RANK_1).getPond().elementsInOrder();
 
-        assertEquals(4, elements.size());
-        // In turn order: top to bottom, then left to right.
+        assertEquals(5, elements.size());
+        // In turn order: top to bottom, then left to right; the pad and the icon at the
+        // same spot stay in file order.
         assertInstanceOf(Reed.class, elements.get(0));
         assertInstanceOf(Turtle.class, elements.get(1));
         assertEquals(0.09, elements.get(1).getSize(), DELTA);
         assertInstanceOf(LilyPad.class, elements.get(2));
         assertEquals(new Vec2(0.42, 0.34), elements.get(2).getPosition());
-        assertInstanceOf(LilyPad.class, elements.get(3));
+        assertInstanceOf(ThrowableIcon.class, elements.get(3));
+        assertInstanceOf(LilyPad.class, elements.get(4));
     }
 
     @Test
@@ -275,8 +278,28 @@ class LevelLoaderTest {
     }
 
     @Test
-    void iconsAreNotAvailableYet() {
-        assertContains("not available yet", errorFor(SETTINGS + "icon plank 0.42 0.34\n", 5));
+    void anIconLineAddsAThrowableIconOfThatKind() throws LevelFormatException {
+        Element element = load(SETTINGS + "icon plank 0.42 0.34\n").getPond().elementsInOrder().get(0);
+
+        ThrowableIcon icon = assertInstanceOf(ThrowableIcon.class, element);
+        assertEquals(ThrowableKind.PLANK, icon.getKind());
+        assertEquals(new Vec2(0.42, 0.34), icon.getPosition());
+        assertEquals(0.04, icon.getSize(), DELTA);
+    }
+
+    @Test
+    void anIconCanHaveItsOwnDiameter() throws LevelFormatException {
+        Element icon = load(SETTINGS + "icon log 0.42 0.34 0.06\n").getPond().elementsInOrder().get(0);
+
+        assertEquals(0.06, icon.getSize(), DELTA);
+    }
+
+    @Test
+    void badIconLinesAreRefused() {
+        assertContains("unknown throwable kind 'rock'", errorFor(SETTINGS + "icon rock 0.42 0.34\n", 5));
+        assertContains("needs 3 or 4 values, found 2", errorFor(SETTINGS + "icon 0.42 0.34\n", 5));
+        assertContains("outside the play area", errorFor(SETTINGS + "icon twig 1.5 0.34\n", 5));
+        assertContains("must be greater than 0", errorFor(SETTINGS + "icon twig 0.42 0.34 0\n", 5));
     }
 
     @Test
