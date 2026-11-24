@@ -23,9 +23,6 @@ public final class Balance {
     /** How far a floating object moves when a ripple pushes it. [proposed] */
     public static final double RIPPLE_PUSH_DISTANCE = 0.08;
 
-    /** How many turns a ripple keeps spreading before it fades (GDD 3.1). */
-
-    public static final int RIPPLE_TURNS = 3;
     /** Diameter of the frog, in play-area widths. [proposed] */
     public static final double FROG_SIZE = 0.04;
 

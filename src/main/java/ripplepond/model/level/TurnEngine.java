@@ -25,7 +25,6 @@ import ripplepond.model.ripple.Ripple;
  * {@code TODO(S6)} and stay commented until those tasks merge.
  */
 public class TurnEngine {
-
     /**
      * Runs the five steps of a turn in order, then removes the ripples that have faded.
      *
@@ -40,7 +39,9 @@ public class TurnEngine {
         spreadRipples(level.getPond());
         objectsReact(level);
         frogMoves(level, action);
-        predatorsAct(level);
+        if (!new EndRules().hasWon(level)) {
+            predatorsAct(level);
+        }
         level.getPond().removeFadedRipples();
     }
 

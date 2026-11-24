@@ -119,6 +119,15 @@ class TurnEngineTest {
         }
         return result;
     }
+    /** Counts how many times the predators' step runs. */
+    private static final class CountingEngine extends TurnEngine {
+        int predatorTurns;
+
+        @Override
+        protected void predatorsAct(Level level) {
+            predatorTurns++;
+        }
+    }
 
     @Test
     void nullLevelOrActionIsRejected() {
@@ -630,5 +639,30 @@ class TurnEngineTest {
         assertSame(pad, frog.standingOn().orElseThrow());
     }
 
+    // Predator skip on the winning turn (GDD 3.2, S5).
+
+    @Test
+    void predatorsDoNotActOnTheTurnTheFrogReachesTheFarBank() {
+        CountingEngine engine = new CountingEngine();
+        // Banks of 0.125 at top and bottom; the frog starts on the far bank, so the turn wins.
+        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, 0.125, 0.125,
+                new Frog(new Vec2(0.5, 0.0625), Rank.RANK_1));
+
+        engine.runTurn(levelOn(pond), NOTHING);
+
+        assertEquals(0, engine.predatorTurns);
+    }
+
+    @Test
+    void predatorsActOnAnOrdinaryTurn() {
+        // Control: the frog is on the start bank, so the turn is not a win.
+        CountingEngine engine = new CountingEngine();
+        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, 0.125, 0.125,
+                new Frog(new Vec2(0.5, 0.625), Rank.RANK_1));
+
+        engine.runTurn(levelOn(pond), NOTHING);
+
+        assertEquals(1, engine.predatorTurns);
+    }
     // TODO(S6) activation: predators. Add once Predator and its hook exist.
 }
