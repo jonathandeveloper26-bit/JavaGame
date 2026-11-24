@@ -1,7 +1,7 @@
 # Ripple Pond - UML class diagram
 
-Version 3, 24 November 2026. Matches Draft 5 of the Game Design Document and the code in
-`main` on 24 November (tasks S1 to S5, J1 to J9, X1 and X3).
+Version 3, 25 November 2026. Matches Draft 5 of the Game Design Document and the code in
+`main` on 25 November (tasks S1 to S5, J1 to J9, X1, X3 and X4).
 
 This file is the editable source of the class diagram. The diagrams are written in
 Mermaid, which GitHub, IntelliJ IDEA and VS Code (with a Mermaid extension) render
@@ -51,6 +51,7 @@ class Element {
   +touches(other: Element) boolean
   +distanceTo(other: Element) double
   +isSolid() boolean
+  +blocksLine(from: Vec2, to: Vec2) boolean
   +reactTo(push: Vec2, level: Level)
 }
 class AbstractElement {
@@ -100,6 +101,7 @@ class Turtle {
 }
 class Reed {
   +isSolid() boolean
+  +blocksLine(from: Vec2, to: Vec2) boolean
   +liesBetween(from: Vec2, to: Vec2) boolean
 }
 class Predator {
@@ -172,7 +174,10 @@ Notes:
   blocked, and nothing moves, if `Pond.isClearFor` says the new spot would overlap a
   solid element or reach onto a bank.
 - `Reed` is a solid clump that never moves. `liesBetween` answers whether the clump is
-  on the straight line between two points; the ripple uses it for the reed shadow rule.
+  on the straight line between two points. `blocksLine` is a default method on
+  `Element` that returns `false`; `Reed` overrides it with `liesBetween`, so
+  `Pond.reedBetween` asks every element instead of checking for reeds by class. The
+  ripple uses it for the reed shadow rule, and walking and swimming use it too.
 - `Snake`, `Bird` and `Fish` each answer `getDamage` and `canEnter` differently. They are
   still empty classes until task S6.
 - `Food.collect` is `final` (a Template method): restore, leave the pond, publish
@@ -452,9 +457,11 @@ Notes:
   distance (`pushStep`), and calls `Element.reactTo` once per element.
 - `frogMoves` calls `Frog.move`; a move that happens publishes `FROG_MOVED` and lets the
   frog collect every `Pickup` it touches.
-- `predatorsAct` (S6) will move predators on every second turn only, but let them attack
-  on every turn, and skip the turn the frog reaches the far bank (`EndRules.hasWon`).
-  `ChaseStrategy` and `StraightLineChase` come with S6 too; they are empty classes now.
+- `runTurn` skips `predatorsAct` on the turn the frog reaches the far bank
+  (`EndRules.hasWon`). `predatorsAct` (S6) will move predators on every second turn
+  only, but let them attack on every turn. `ChaseStrategy` and `StraightLineChase` come
+  with S6 too; they are empty classes now.
+- A `Pond` always has a frog: its constructor refuses `null`.
 - `Pond.elementsInOrder` returns elements top to bottom, then left to right
   (`ElementOrder`), so the result is always the same for the same input.
 - `Pond.WIDTH` is 1 and `Pond.HEIGHT` is 2/3: the play area's fixed 3:2 shape.
@@ -638,10 +645,11 @@ Notes:
 - `ThrowableKind` uses the placeholder names twig, plank and log (GDD section 10).
 - `StraightLineChase` is the simple rule proposed in the GDD. A smarter rule that goes
   around reed clumps would be a second `ChaseStrategy`, with no change to `Predator`.
-- Five places still check a class with `instanceof` instead of asking the object:
-  `Pond.surfaceAt` (FloatingObject), `Pond.reedBetween` (Reed), `TurnEngine` collecting
-  pickups (Pickup), and `GameSession` and `GameController` checking for `Won`. Each has
-  a polymorphic fix (for example `LevelState.isWon()`); they are left for a clean-up.
+- Four places still check a class with `instanceof` instead of asking the object:
+  `Pond.surfaceAt` (FloatingObject), `TurnEngine` collecting pickups (Pickup), and
+  `GameSession` and `GameController` checking for `Won`. Each has a polymorphic fix (for
+  example `LevelState.isWon()`), like the one `blocksLine` already made for reeds; they
+  are left for a clean-up.
 - Undo is a stretch goal and is not modelled. If it is built, a turn's changes could be
   recorded as commands that can be reversed, without changing the classes above.
 - Method lists show the operations that matter for the design. Getters, setters and
@@ -653,6 +661,9 @@ Changed since version 2, to match the code:
   per element with the combined push (agreed on pull request #9). `onRipple` changed to
   match, and `TurnEngine.objectsReact` takes the `Level`.
 - `Element.isSolid` and `Pond.isClearFor` added for blocked pushes.
+- `Element.blocksLine` added and overridden by `Reed`, so `Pond.reedBetween` no longer
+  checks for reeds by class. `Pond` refuses a missing frog. `runTurn` skips the
+  predators on the turn the frog wins.
 - `AbstractMoveMode` added between `MoveMode` and the three modes.
 - `Frog.move` returns whether the frog moved; `spendEnergy` and `standOn` added.
 - `ThrowBag.take` takes the throw target; `count` added.
