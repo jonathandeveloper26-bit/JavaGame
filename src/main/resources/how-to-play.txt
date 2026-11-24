@@ -1,0 +1,15 @@
+RIPPLE POND - HOW TO PLAY
+Get the frog from the bank at the bottom to the far bank at the top.
+Each turn you may throw one object and make one move. Then the river reacts:
+  1. Your object lands where you click on open water and starts a ripple.
+  2. Every ripple grows.  3. Floating things its ring reaches are pushed away.
+  4. The frog makes its move.  5. Predators move and attack.
+Walk on a bank or along the object you stand on. The cheapest move.
+Hop from one bank or floating object to another. Twice the energy of a walk.
+Swim through open water once you reach rank 3. Four times the energy of a walk.
+Longer moves cost more energy. A move you cannot pay for is refused.
+Touch food to get health and energy back. Touch an icon to add an object to your bag.
+Reeds block ripples and pushes. A ripple wakes a sleeping turtle and moves it.
+Win: reach the far bank. Lose: run out of health, energy or turns.
+Winning earns XP. Higher ranks hop further and have more health and energy.
+Reset restarts the level and keeps your XP.
