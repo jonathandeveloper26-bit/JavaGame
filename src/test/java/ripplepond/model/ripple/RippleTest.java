@@ -7,9 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import ripplepond.model.Balance;
 import ripplepond.model.element.Element;
+import ripplepond.model.element.Frog;
 import ripplepond.model.element.Reed;
 import ripplepond.model.geometry.Vec2;
 import ripplepond.model.level.Pond;
+import ripplepond.model.progress.Rank;
 
 /**
  * Tests for the ripple rules in GDD sections 3.1 and 8.4: growth, fading, pushing once,
@@ -28,12 +30,15 @@ class RippleTest {
             ripple.advance(pond);
         }
     }
-
+    private static Pond emptyPond() {
+        return new Pond(Pond.WIDTH, Pond.HEIGHT,
+                new Frog(new Vec2(0, 0), Rank.RANK_1));
+    }
     @Test
     void radiusGrowsByTheBalanceAmountEachTurn() {
         Vec2 source = new Vec2(0.5, 0.3);
         Ripple ripple = new Ripple(source, new StubElement(source, 0.04), new CircularSpread());
-        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, null);
+        Pond pond = emptyPond();
 
         ripple.advance(pond);
         assertEquals(Balance.RIPPLE_GROWTH_PER_TURN, ripple.getRadius(), DELTA);
@@ -46,7 +51,7 @@ class RippleTest {
     void rippleFadesAfterItsTurns() {
         Vec2 source = new Vec2(0.5, 0.3);
         Ripple ripple = new Ripple(source, new StubElement(source, 0.04), new CircularSpread());
-        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, null);
+        Pond pond = emptyPond();
 
         advance(ripple, pond, Balance.RIPPLE_LIFETIME_TURNS - 1);
         assertFalse(ripple.isFaded());
@@ -59,7 +64,7 @@ class RippleTest {
     void fadedRippleDoesNotGrowAnyMore() {
         Vec2 source = new Vec2(0.5, 0.3);
         Ripple ripple = new Ripple(source, new StubElement(source, 0.04), new CircularSpread());
-        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, null);
+        Pond pond = emptyPond();
         advance(ripple, pond, Balance.RIPPLE_LIFETIME_TURNS);
         double radiusWhenFaded = ripple.getRadius();
 
@@ -75,7 +80,7 @@ class RippleTest {
         Vec2 source = new Vec2(0.5, 0.1);
         Ripple ripple = new Ripple(source, new StubElement(source, 0.04), new CircularSpread());
         Element element = new StubElement(new Vec2(0.5, 0.3), 0.04);
-        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, null);
+        Pond pond = emptyPond();
 
         ripple.advance(pond);
         assertFalse(ripple.passes(element, pond), "turn 1: ring has not reached the edge");
@@ -91,7 +96,7 @@ class RippleTest {
         Vec2 source = new Vec2(0.5, 0.3);
         Element origin = new StubElement(source, 0.04);
         Ripple ripple = new Ripple(source, origin, new CircularSpread());
-        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, null);
+        Pond pond = emptyPond();
 
         advance(ripple, pond, Balance.RIPPLE_LIFETIME_TURNS);
 
@@ -104,7 +109,7 @@ class RippleTest {
         Vec2 source = new Vec2(0.5, 0.3);
         Ripple ripple = new Ripple(source, new StubElement(new Vec2(0.1, 0.1), 0.04), new CircularSpread());
         Element covering = new StubElement(new Vec2(0.5, 0.35), 0.4);
-        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, null);
+        Pond pond = emptyPond();
 
         advance(ripple, pond, Balance.RIPPLE_LIFETIME_TURNS);
 
@@ -138,12 +143,21 @@ class RippleTest {
 
     @Test
     void reedClumpBetweenSourceAndElementShadowsIt() {
-        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, null);
+        Pond pond = emptyPond();
         pond.add(new Reed(new Vec2(0.5, 0.2), 0.06));
         Vec2 source = new Vec2(0.5, 0.1);
         Ripple ripple = new Ripple(source, new StubElement(source, 0.04), new CircularSpread());
         Element behindReed = new StubElement(new Vec2(0.5, 0.3), 0.04);
         advance(ripple, pond, Balance.RIPPLE_LIFETIME_TURNS);
         assertFalse(ripple.passes(behindReed, pond));
+    }
+    @Test
+    void sameGeometryWithoutAReedReachesTheElement() {
+        Pond pond = emptyPond();
+        Vec2 source = new Vec2(0.5, 0.1);
+        Ripple ripple = new Ripple(source, new StubElement(source, 0.04), new CircularSpread());
+        Element behind = new StubElement(new Vec2(0.5, 0.3), 0.04);
+        advance(ripple, pond, Balance.RIPPLE_LIFETIME_TURNS);
+        assertTrue(ripple.passes(behind, pond));
     }
 }

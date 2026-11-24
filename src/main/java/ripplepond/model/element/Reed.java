@@ -92,4 +92,8 @@ public final class Reed extends AbstractElement {
     private static double dot(Vec2 u, Vec2 v) {
         return u.getX() * v.getX() + u.getY() * v.getY();
     }
+    @Override
+    public boolean blocksLine(Vec2 from, Vec2 to) {
+        return liesBetween(from, to);
+    }
 }

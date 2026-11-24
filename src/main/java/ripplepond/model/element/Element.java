@@ -46,4 +46,7 @@ public interface Element {
      *              what happened to it
      */
     void reactTo(Vec2 push, Level level);
+    default boolean blocksLine(Vec2 from, Vec2 to) {
+        return false;
+    }
 }

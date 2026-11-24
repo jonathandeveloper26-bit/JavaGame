@@ -48,7 +48,7 @@ public class Pond {
      *
      * @param width  the width of the play area
      * @param height the height of the play area
-     * @param frog   the frog that the player controls
+     * @param frog   the frog that the player controls @throws NullPointerException if {@code frog} is {@code null}.
      */
     public Pond(double width, double height, Frog frog) {
         this(width, height, 0, 0, frog);
@@ -78,7 +78,7 @@ public class Pond {
         this.height = height;
         this.farBankDepth = farBankDepth;
         this.startBankDepth = startBankDepth;
-        this.frog = frog;
+        this.frog = Objects.requireNonNull(frog, "frog");
         this.areas = buildAreas(height, farBankDepth, startBankDepth);
     }
 
@@ -174,7 +174,7 @@ public class Pond {
         }
         // The frog is not one of the elements, so it is checked on its own. Some test
         // ponds have no frog.
-        if (frog != null && point.distanceTo(frog.getPosition()) <= radius + frog.getRadius()) {
+        if (point.distanceTo(frog.getPosition()) <= radius + frog.getRadius()) {
             return false;
         }
         return true;
@@ -251,19 +251,9 @@ public class Pond {
     public boolean reedBetween(Vec2 from, Vec2 to) {
         Objects.requireNonNull(from, "from");
         Objects.requireNonNull(to, "to");
-        for (Element element : elements) {
-            if (element instanceof Reed reed && reed.liesBetween(from, to)) {
-                return true;
-            }
-        }
-        return false;
+        return elements.stream().anyMatch(e -> e.blocksLine(from, to));
     }
 
-    // Preferred form, if the team agrees to add a default method to Element (GDD 8.2,
-    // polymorphism, no instanceof):
-    //   Element:  default boolean blocksLine(Vec2 from, Vec2 to) { return false; }
-    //   Reed:     @Override public boolean blocksLine(Vec2 from, Vec2 to) { return liesBetween(from, to); }
-    //   Pond:     return elements.stream().anyMatch(e -> e.blocksLine(from, to));
 
     /**
      * Returns the elements in turn order: top to bottom, then left to right. The frog is not

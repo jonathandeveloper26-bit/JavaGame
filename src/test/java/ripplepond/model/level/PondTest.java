@@ -206,4 +206,16 @@ class PondTest {
 
         assertSame(right, pond.surfaceAt(new Vec2(0.59375, 0.25)).orElseThrow());
     }
+    @Test
+    void constructorRefusesANullFrog() {
+        assertThrows(NullPointerException.class,
+                () -> new Pond(1, HEIGHT, BANK, BANK, null));
+    }
+
+    @Test
+    void reedBetweenIgnoresNonBlockingElements() {
+        Pond pond = pond();
+        pond.add(new LilyPad(new Vec2(0.5, 0.3), 0.1));
+        assertFalse(pond.reedBetween(new Vec2(0.2, 0.3), new Vec2(0.8, 0.3)));
+    }
 }
