@@ -64,4 +64,13 @@ public final class Balance {
 
     /** The furthest the frog can swim in one move, in play-area widths. [proposed] */
     public static final double SWIM_MAX_DISTANCE = 0.10;
+
+    /** XP every completed level gives, before health and energy are counted (GDD 4.3). [proposed] */
+    public static final int XP_PER_LEVEL = 50;
+
+    /** XP for each point of health the frog has left at the end of a level. [proposed] */
+    public static final int XP_PER_HEALTH_LEFT = 2;
+
+    /** XP for each whole point of energy the frog has left at the end of a level. [proposed] */
+    public static final int XP_PER_ENERGY_LEFT = 1;
 }
