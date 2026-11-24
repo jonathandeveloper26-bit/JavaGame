@@ -37,4 +37,22 @@ public final class Balance {
 
     /** Diameter of a thrown log, in play-area widths. [proposed] */
     public static final double LOG_SIZE = 0.18;
+
+    /** Moves are charged per this distance travelled, in play-area widths (GDD 4.2). [proposed] */
+    public static final double MOVE_UNIT = 0.10;
+
+    /** Energy a walk costs per {@link #MOVE_UNIT} travelled. [proposed] */
+    public static final double WALK_ENERGY_PER_UNIT = 1;
+
+    /** Energy a hop costs per {@link #MOVE_UNIT} travelled: twice a walk. [proposed] */
+    public static final double HOP_ENERGY_PER_UNIT = 2;
+
+    /** Energy a swim costs per {@link #MOVE_UNIT} travelled: four times a walk. [proposed] */
+    public static final double SWIM_ENERGY_PER_UNIT = 4;
+
+    /** The furthest the frog can walk in one move, in play-area widths. [proposed] */
+    public static final double WALK_MAX_DISTANCE = 0.10;
+
+    /** The furthest the frog can swim in one move, in play-area widths. [proposed] */
+    public static final double SWIM_MAX_DISTANCE = 0.10;
 }

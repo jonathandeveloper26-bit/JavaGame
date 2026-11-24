@@ -178,38 +178,29 @@ public class Pond {
     }
 
     /**
-     * Returns the floating object the point lies on, if any.
-     * <p>
-     * <strong>Not yet implemented:</strong> needs {@code FloatingObject.covers(Vec2)} from
-     * Jonathan's task J2, which is not in {@code main} yet.
+     * Returns the floating object the point lies on, if any. When objects overlap, the
+     * one whose centre is nearest the point is returned.
      *
      * @param point the point to test
      * @return the floating object under the point, or empty on open water or a bank
-     * @throws UnsupportedOperationException until J2 is merged
+     * @throws NullPointerException if {@code point} is {@code null}
      */
     public Optional<FloatingObject> surfaceAt(Vec2 point) {
-        throw new UnsupportedOperationException("Waits for FloatingObject.covers from J2");
+        Objects.requireNonNull(point, "point");
+        FloatingObject best = null;
+        double bestDistance = Double.POSITIVE_INFINITY;
+        for (Element element : elements) {
+            if (element instanceof FloatingObject floating && floating.covers(point)) {
+                double distance = point.distanceTo(floating.getPosition());
+                // Strict "<" keeps the earlier object when two are equally near.
+                if (distance < bestDistance) {
+                    best = floating;
+                    bestDistance = distance;
+                }
+            }
+        }
+        return Optional.ofNullable(best);
     }
-
-    // TO ACTIVATE after J2 (FloatingObject.covers exists): delete the stub above and
-    // uncomment the method below.
-    //
-    // public Optional<FloatingObject> surfaceAt(Vec2 point) {
-    //     Objects.requireNonNull(point, "point");
-    //     FloatingObject best = null;
-    //     double bestDistance = Double.POSITIVE_INFINITY;
-    //     for (Element element : elements) {
-    //         if (element instanceof FloatingObject floating && floating.covers(point)) {
-    //             double distance = point.distanceTo(floating.getPosition());
-    //             // Strict "<" keeps the earlier object when two are equally near.
-    //             if (distance < bestDistance) {
-    //                 best = floating;
-    //                 bestDistance = distance;
-    //             }
-    //         }
-    //     }
-    //     return Optional.ofNullable(best);
-    // }
 
     /**
      * Returns {@code true} if a reed clump lies on the straight line between two points.
