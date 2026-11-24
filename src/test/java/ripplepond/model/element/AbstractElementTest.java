@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import ripplepond.model.geometry.Vec2;
 import ripplepond.model.level.Pond;
 import ripplepond.model.ripple.Ripple;
+import ripplepond.model.ripple.CircularSpread;
 
 /**
  * Tests for {@link AbstractElement}. The numbers are chosen to be exact in binary
@@ -41,19 +42,7 @@ class AbstractElementTest {
         }
     }
 
-    /** A ripple whose answer to {@code passes} is fixed, so reactTo can be tested alone. */
-    private static final class FixedRipple extends Ripple {
-        private final boolean passes;
 
-        FixedRipple(boolean passes) {
-            this.passes = passes;
-        }
-
-        @Override
-        public boolean passes(Element element, Pond pond) {
-            return passes;
-        }
-    }
 
     @Test
     void radiusIsHalfTheSize() {
@@ -137,18 +126,29 @@ class AbstractElementTest {
 
     @Test
     void reactToCallsOnRippleWhenTheRingPasses() {
-        TestElement element = new TestElement(0.5, 0.5, 0.125);
+        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, null);
+        Vec2 source = new Vec2(0.5, 0.5);
+        Ripple ripple = new Ripple(source, new TestElement(source, 0.04), new CircularSpread());
+        TestElement element = new TestElement(0.5, 0.7, 0.04);
+        // The edge is 0.18 from the source; after three turns the ring has reached 0.24.
+        for (int i = 0; i < 3; i++) {
+            ripple.advance(pond);
+        }
 
-        element.reactTo(new FixedRipple(true), null);
+        element.reactTo(ripple, pond);
 
         assertEquals(1, element.ripplesFelt);
     }
 
     @Test
     void reactToDoesNothingWhenTheRingDoesNotPass() {
-        TestElement element = new TestElement(0.5, 0.5, 0.125);
+        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, null);
+        Vec2 source = new Vec2(0.5, 0.5);
+        Ripple ripple = new Ripple(source, new TestElement(source, 0.04), new CircularSpread());
+        TestElement element = new TestElement(0.5, 0.7, 0.04);
+        // No turn has run, so the ring has not moved.
 
-        element.reactTo(new FixedRipple(false), null);
+        element.reactTo(ripple, pond);
 
         assertEquals(0, element.ripplesFelt);
     }

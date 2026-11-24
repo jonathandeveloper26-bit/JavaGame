@@ -171,10 +171,9 @@ public class Pond {
                 return false;
             }
         }
-        // TO ACTIVATE after J2 (Frog extends AbstractElement): uncomment these lines.
-        // if (point.distanceTo(frog.getPosition()) <= radius + frog.getRadius()) {
-        //     return false;
-        // }
+        //if (point.distanceTo(frog.getPosition()) <= radius + frog.getRadius()) {
+        //    return false;
+        //}
         return true;
     }
 
@@ -286,12 +285,11 @@ public class Pond {
         return Collections.unmodifiableList(ripples);
     }
 
-    // TO ACTIVATE after S4 (Ripple.isFaded exists): uncomment the method below.
-    //
-    // /**
-    //  * Removes the ripples that have faded out. Called once per turn, after the ripples spread.
-    //  */
-    // public void removeFadedRipples() {
-    //     ripples.removeIf(Ripple::isFaded);
-    // }
+
+     /**
+      * Removes the ripples that have faded out. Called once per turn, after the ripples spread.
+      */
+     public void removeFadedRipples() {
+         ripples.removeIf(Ripple::isFaded);
+     }
 }

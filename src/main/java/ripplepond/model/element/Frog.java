@@ -1,5 +1,6 @@
 package ripplepond.model.element;
 
+public class Frog{
 import java.util.Objects;
 import java.util.Optional;
 
