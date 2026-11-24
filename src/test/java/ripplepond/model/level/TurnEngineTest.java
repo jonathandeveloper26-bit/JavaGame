@@ -12,9 +12,11 @@ import org.junit.jupiter.api.Test;
 
 import ripplepond.model.Balance;
 import ripplepond.model.element.Element;
+import ripplepond.model.element.Frog;
 import ripplepond.model.event.GameEvent;
 import ripplepond.model.event.PondListener;
 import ripplepond.model.geometry.Vec2;
+import ripplepond.model.progress.Rank;
 import ripplepond.model.ripple.CircularSpread;
 import ripplepond.model.ripple.Ripple;
 
@@ -81,11 +83,14 @@ class TurnEngineTest {
     }
 
     private static Pond emptyPond() {
-        return new Pond(Pond.WIDTH, Pond.HEIGHT, null);
+        // A pond with no banks is all water. The frog sits in it, away from the far bank,
+        // so the end rules keep the level in progress (J3). It is not one of the pond's
+        // elements, so ripples never push it.
+        return new Pond(Pond.WIDTH, Pond.HEIGHT, new Frog(new Vec2(0.5, 0.5), Rank.RANK_1));
     }
 
     private static Level levelOn(Pond pond) {
-        return new Level(pond, new ThrowBag(), 40, new LevelState());
+        return new Level(pond, new ThrowBag(), 40, new InProgress());
     }
 
     private static Ripple rippleAt(Vec2 source) {

@@ -18,7 +18,6 @@ public class Level {
     private LevelState state;
     private int turn;
     private final List<PondListener> listeners = new ArrayList<>();
-    private final TurnEngine engine = new TurnEngine();
 
     /**
      * Creates a level at turn 0.
@@ -26,32 +25,38 @@ public class Level {
      * @param pond      the pond the level is played in
      * @param bag       the objects the player can throw
      * @param turnLimit the number of turns allowed
-     * @param state     the state the level starts in
+     * @param state     the state the level starts in, normally {@code new InProgress()}
+     * @throws NullPointerException if {@code pond}, {@code bag} or {@code state} is
+     *                              {@code null}
      */
     public Level(Pond pond, ThrowBag bag, int turnLimit, LevelState state) {
         this.pond = Objects.requireNonNull(pond, "pond");
         this.bag = Objects.requireNonNull(bag, "bag");
         this.turnLimit = turnLimit;
-        this.state = state;
+        this.state = Objects.requireNonNull(state, "state");
         this.turn = 0;
     }
 
     /**
-     * Plays one turn. The turn counter goes up by one before the engine runs.
+     * Plays one turn by handing it to the current state, and keeps the state the turn
+     * ends in (State pattern). While the level is in progress, the state runs the turn
+     * engine and then the end rules; a won or lost level refuses the turn.
      * <p>
-     * TODO(J3): once {@code LevelState.playTurn} exists, replace the direct engine call with
-     * the state delegation below, which lets a won or lost level refuse turns.
-     * <pre>
-     * // state = state.playTurn(this, action);
-     * </pre>
+     * The turn counter goes up before the state plays the turn, so the end rules see
+     * the turn that has just been played when they check the turn limit. A refused turn
+     * is not counted.
      *
      * @param action what the player asked for this turn
-     * @throws NullPointerException if {@code action} is {@code null}
+     * @throws NullPointerException  if {@code action} is {@code null}
+     * @throws IllegalStateException if the level is already won or lost
      */
     public void playTurn(TurnAction action) {
         Objects.requireNonNull(action, "action");
+        if (state.isOver()) {
+            throw new IllegalStateException("the level is over: " + state);
+        }
         turn++;
-        engine.runTurn(this, action);
+        state = state.playTurn(this, action);
     }
 
     /** Returns the current state: in progress, won or lost. */
