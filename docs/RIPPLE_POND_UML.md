@@ -243,7 +243,7 @@ class ExperienceRules {
   +xpFor(frog: Frog) int
 }
 class GameSession {
-  +LEVEL_FILES$ List~String~
+  +LEVEL_FILES: List~String~$
   -levelFiles: List~String~
   -unlockedLevels: int
   +startLevel(index: int) Level
@@ -358,8 +358,8 @@ class EndRules {
   +evaluate(level: Level) LevelState
 }
 class Pond {
-  +WIDTH$ double
-  +HEIGHT$ double
+  +WIDTH: double$
+  +HEIGHT: double$
   -areas: List~Area~
   -elements: List~Element~
   -ripples: List~Ripple~
