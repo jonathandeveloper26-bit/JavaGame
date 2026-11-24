@@ -22,4 +22,16 @@ public final class Balance {
 
     /** How far a floating object moves when a ripple pushes it. [proposed] */
     public static final double RIPPLE_PUSH_DISTANCE = 0.08;
+
+    /** Diameter of the frog, in play-area widths. [proposed] */
+    public static final double FROG_SIZE = 0.04;
+
+    /** Diameter of a thrown twig, in play-area widths. [proposed] */
+    public static final double TWIG_SIZE = 0.05;
+
+    /** Diameter of a thrown plank, in play-area widths. [proposed] */
+    public static final double PLANK_SIZE = 0.10;
+
+    /** Diameter of a thrown log, in play-area widths. [proposed] */
+    public static final double LOG_SIZE = 0.18;
 }
