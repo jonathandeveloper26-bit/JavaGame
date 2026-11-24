@@ -14,6 +14,9 @@ import ripplepond.model.element.Turtle;
 import ripplepond.model.element.pickup.Breadcrumb;
 import ripplepond.model.element.pickup.Fly;
 import ripplepond.model.element.pickup.Minnow;
+import ripplepond.model.element.predator.Bird;
+import ripplepond.model.element.predator.Fish;
+import ripplepond.model.element.predator.Snake;
 import ripplepond.model.geometry.Vec2;
 
 /**
@@ -69,6 +72,9 @@ public class ElementFactory {
         register("fly", Balance.FLY_SIZE, Fly::new);
         register("minnow", Balance.MINNOW_SIZE, Minnow::new);
         register("breadcrumb", Balance.BREADCRUMB_SIZE, Breadcrumb::new);
+        register("snake", Balance.SNAKE_SIZE, Snake::new);
+        register("bird", Balance.BIRD_SIZE, Bird::new);
+        register("fish", Balance.FISH_SIZE, Fish::new);
     }
 
     /**

@@ -14,6 +14,7 @@ import ripplepond.model.event.GameEvent;
 import ripplepond.model.geometry.Vec2;
 import ripplepond.model.ripple.CircularSpread;
 import ripplepond.model.ripple.Ripple;
+import ripplepond.model.element.predator.Predator;
 
 /**
  * Runs one turn as five steps in a fixed order (GDD section 3): throw, ripples spread,
@@ -180,7 +181,22 @@ public class TurnEngine {
      *
      * @param level the level being played
      */
+    /**
+     * Step 5: each predator takes its turn, in turn order (GDD 3, step 5). Every point of
+     * damage a predator deals publishes {@code FROG_HURT}, with the damage as its amount.
+     * Predators do not act on a turn the frog has won; {@link #runTurn} checks that first.
+     *
+     * @param level the level being played
+     */
     protected void predatorsAct(Level level) {
-        // TODO(S6): predators move every second turn and attack on any turn in reach.
+        Pond pond = level.getPond();
+        for (Element element : pond.elementsInOrder()) {
+            if (element instanceof Predator predator) {
+                int damage = predator.act(pond, level.getTurn());
+                if (damage > 0) {
+                    level.publish(new GameEvent(EventType.FROG_HURT, pond.getFrog(), damage));
+                }
+            }
+        }
     }
 }
