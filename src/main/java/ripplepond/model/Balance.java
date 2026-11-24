@@ -37,4 +37,13 @@ public final class Balance {
 
     /** Diameter of a thrown log, in play-area widths. [proposed] */
     public static final double LOG_SIZE = 0.18;
+
+    /** Default diameter of a lily pad in a level file, in play-area widths. [proposed] */
+    public static final double LILY_PAD_SIZE = 0.08;
+
+    /** Default diameter of a turtle in a level file, in play-area widths. [proposed] */
+    public static final double TURTLE_SIZE = 0.07;
+
+    /** Default diameter of a reed clump in a level file, in play-area widths. [proposed] */
+    public static final double REED_SIZE = 0.10;
 }
