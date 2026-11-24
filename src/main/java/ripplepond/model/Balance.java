@@ -94,4 +94,20 @@ public final class Balance {
 
     /** Health a breadcrumb restores (GDD 2.5). [proposed] */
     public static final int BREADCRUMB_HEALTH = 3;
+    /** Diameter of a snake, in play-area widths. [proposed] */
+    public static final double SNAKE_SIZE = 0.08;
+    /** Diameter of a bird, in play-area widths. [proposed] */
+    public static final double BIRD_SIZE = 0.06;
+    /** Diameter of a fish, in play-area widths. [proposed] */
+    public static final double FISH_SIZE = 0.06;
+    /** Damage a snake deals each turn the frog is in reach (GDD 2.4). */
+    public static final int SNAKE_DAMAGE = 3;
+    /** Damage a bird deals each turn the frog is in reach (GDD 2.4). */
+    public static final int BIRD_DAMAGE = 2;
+    /** Damage a fish deals each turn the frog is in reach (GDD 2.4). */
+    public static final int FISH_DAMAGE = 2;
+    /** Distance a predator moves on each move it makes (GDD 2.4). */
+    public static final double PREDATOR_STEP = 0.06;
+    /** Turns between predator moves: they move on every second turn (GDD 2.4). */
+    public static final int PREDATOR_MOVE_EVERY = 2;
 }

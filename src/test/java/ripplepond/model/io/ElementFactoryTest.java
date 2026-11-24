@@ -3,7 +3,7 @@ package ripplepond.model.io;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -18,6 +18,9 @@ import ripplepond.model.element.Turtle;
 import ripplepond.model.element.pickup.Breadcrumb;
 import ripplepond.model.element.pickup.Fly;
 import ripplepond.model.element.pickup.Minnow;
+import ripplepond.model.element.predator.Bird;
+import ripplepond.model.element.predator.Fish;
+import ripplepond.model.element.predator.Snake;
 import ripplepond.model.geometry.Vec2;
 
 /**
@@ -50,6 +53,13 @@ class ElementFactoryTest {
         assertInstanceOf(Fly.class, factory.create("fly", AT, 0.125));
         assertInstanceOf(Minnow.class, factory.create("minnow", AT, 0.125));
         assertInstanceOf(Breadcrumb.class, factory.create("breadcrumb", AT, 0.125));
+    }
+
+    @Test
+    void predatorNamesMakeTheirOwnClass() throws LevelFormatException {
+        assertInstanceOf(Snake.class, factory.create("snake", AT, 0.08));
+        assertInstanceOf(Bird.class, factory.create("bird", AT, 0.06));
+        assertInstanceOf(Fish.class, factory.create("fish", AT, 0.06));
     }
 
     @Test
@@ -90,10 +100,8 @@ class ElementFactoryTest {
     }
 
     @Test
-    void typesNotWrittenYetAreUnknown() {
-        assertTrue(factory.knows("reed"));
-        assertTrue(factory.knows("fly"));
-        assertFalse(factory.knows("snake"));
+    void iconsAreNotElementTypes() {
+        // Throwable icons use their own line format and are handled by the loader.
         assertFalse(factory.knows("icon"));
     }
 
@@ -129,7 +137,7 @@ class ElementFactoryTest {
         Element first = factory.create("reed", AT, 0.125);
         Element second = factory.create("reed", AT, 0.125);
 
-        assertFalse(first == second);
-        assertSame(Reed.class, second.getClass());
+        assertNotSame(first, second);
+        assertInstanceOf(Reed.class, second);
     }
 }

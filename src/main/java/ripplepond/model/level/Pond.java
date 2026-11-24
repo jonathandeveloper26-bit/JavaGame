@@ -254,6 +254,23 @@ public class Pond {
         return elements.stream().anyMatch(e -> e.blocksLine(from, to));
     }
 
+    /**
+     * Returns {@code true} if the point lies inside a reed clump. Predators that live in
+     * reeds (snakes) and predators that must avoid them (fish) ask this question.
+     *
+     * @param point the point to test
+     * @return whether a reed clump covers the point
+     * @throws NullPointerException if {@code point} is {@code null}
+     */
+    public boolean isInReed(Vec2 point) {
+        Objects.requireNonNull(point, "point");
+        for (Element element : elements) {
+            if (element instanceof Reed && point.distanceTo(element.getPosition()) <= element.getRadius()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Returns the elements in turn order: top to bottom, then left to right. The frog is not
