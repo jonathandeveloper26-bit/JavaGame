@@ -1,0 +1,11 @@
+# Test level for X1: a fly, a minnow and a breadcrumb in a row along the start bank,
+# each 0.10 from the last, so the frog eats one per walk.
+
+turns 10
+bank far 0.12
+bank start 0.12
+frog 0.20 0.60
+
+fly        0.30 0.60
+minnow     0.40 0.60
+breadcrumb 0.50 0.60

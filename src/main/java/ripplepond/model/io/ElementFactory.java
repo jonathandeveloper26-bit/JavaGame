@@ -11,6 +11,9 @@ import ripplepond.model.element.Reed;
 import ripplepond.model.element.ThrowableKind;
 import ripplepond.model.element.ThrownObject;
 import ripplepond.model.element.Turtle;
+import ripplepond.model.element.pickup.Breadcrumb;
+import ripplepond.model.element.pickup.Fly;
+import ripplepond.model.element.pickup.Minnow;
 import ripplepond.model.geometry.Vec2;
 
 /**
@@ -22,8 +25,7 @@ import ripplepond.model.geometry.Vec2;
  * {@link Creator} and a default size, used when the level file gives no diameter.
  * <p>
  * Adding a new element type means adding one {@code register} line to the constructor:
- * Stephan adds {@code snake}, {@code bird} and {@code fish} (S6), and Xaryab adds
- * {@code fly}, {@code minnow} and {@code breadcrumb} (X1). Throwable icons use their own
+ * Stephan adds {@code snake}, {@code bird} and {@code fish} (S6). Throwable icons use their own
  * line format ({@code icon <kind> <x> <y>}), so the loader handles them, not this class.
  */
 public class ElementFactory {
@@ -64,6 +66,9 @@ public class ElementFactory {
         register("lilypad", Balance.LILY_PAD_SIZE, LilyPad::new);
         register("turtle", Balance.TURTLE_SIZE, Turtle::new);
         register("reed", Balance.REED_SIZE, Reed::new);
+        register("fly", Balance.FLY_SIZE, Fly::new);
+        register("minnow", Balance.MINNOW_SIZE, Minnow::new);
+        register("breadcrumb", Balance.BREADCRUMB_SIZE, Breadcrumb::new);
     }
 
     /**
