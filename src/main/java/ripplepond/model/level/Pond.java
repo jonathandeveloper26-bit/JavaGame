@@ -181,6 +181,40 @@ public class Pond {
     }
 
     /**
+     * Returns {@code true} if an element that is already in the pond could move its
+     * centre to {@code centre}: the whole circle stays in the water and inside the play
+     * area, and it does not overlap any solid element (reed clump, turtle, floating
+     * object) other than itself. Pickups do not block. Just touching is allowed, so a
+     * pushed object can come to rest against another.
+     * <p>
+     * Unlike {@link #isFree}, which places a new thrown object, this ignores the element
+     * itself and anything that is not solid.
+     *
+     * @param mover  the element that would move
+     * @param centre the centre it would move to
+     * @return whether the move is clear
+     * @throws NullPointerException if {@code mover} or {@code centre} is {@code null}
+     */
+    public boolean isClearFor(Element mover, Vec2 centre) {
+        Objects.requireNonNull(mover, "mover");
+        Objects.requireNonNull(centre, "centre");
+        double radius = mover.getRadius();
+        if (centre.getX() - radius < 0 || centre.getX() + radius > width) {
+            return false;
+        }
+        if (centre.getY() - radius < farBankDepth || centre.getY() + radius > height - startBankDepth) {
+            return false;
+        }
+        for (Element element : elements) {
+            if (element != mover && element.isSolid()
+                    && centre.distanceTo(element.getPosition()) < radius + element.getRadius()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Returns the floating object the point lies on, if any. When objects overlap, the
      * one whose centre is nearest the point is returned.
      *

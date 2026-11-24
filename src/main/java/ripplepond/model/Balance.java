@@ -47,6 +47,9 @@ public final class Balance {
     /** Default diameter of a reed clump in a level file, in play-area widths. [proposed] */
     public static final double REED_SIZE = 0.10;
 
+    /** Default diameter of a throwable icon in a level file, in play-area widths. [proposed] */
+    public static final double ICON_SIZE = 0.04;
+
     /** Moves are charged per this distance travelled, in play-area widths (GDD 4.2). [proposed] */
     public static final double MOVE_UNIT = 0.10;
 
@@ -64,4 +67,13 @@ public final class Balance {
 
     /** The furthest the frog can swim in one move, in play-area widths. [proposed] */
     public static final double SWIM_MAX_DISTANCE = 0.10;
+
+    /** XP every completed level gives, before health and energy are counted (GDD 4.3). [proposed] */
+    public static final int XP_PER_LEVEL = 50;
+
+    /** XP for each point of health the frog has left at the end of a level. [proposed] */
+    public static final int XP_PER_HEALTH_LEFT = 2;
+
+    /** XP for each whole point of energy the frog has left at the end of a level. [proposed] */
+    public static final int XP_PER_ENERGY_LEFT = 1;
 }

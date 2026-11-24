@@ -1,0 +1,8 @@
+# A level won with one hop, for the session and controller tests.
+# Both banks are 0.30 deep, so the water is a thin strip from y 0.30 to about 0.367.
+# The frog starts just below it; a hop to (0.50, 0.29), 0.08 away, lands on the far bank.
+
+turns 5
+bank far 0.30
+bank start 0.30
+frog 0.50 0.37

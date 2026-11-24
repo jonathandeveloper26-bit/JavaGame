@@ -111,17 +111,17 @@ class FloatingObjectTest {
 
     @Test
     void onlyTheDirectionOfTheVectorCountsNotItsLength() {
-        object.push(new Vec2(0, 4), 0.25, pond);
+        object.push(new Vec2(0, -4), 0.25, pond);
 
-        assertAt(0.5, 0.75, object);
+        assertAt(0.5, 0.25, object);
     }
 
     @Test
     void pushWorksDiagonally() {
-        // (3, 4) has length 5, so a push of 0.5 moves 0.3 across and 0.4 down.
-        object.push(new Vec2(3, 4), 0.5, pond);
+        // (3, -4) has length 5, so a push of 0.25 moves 0.15 across and 0.2 up.
+        object.push(new Vec2(3, -4), 0.25, pond);
 
-        assertAt(0.8, 0.9, object);
+        assertAt(0.65, 0.3, object);
     }
 
     @Test
@@ -140,9 +140,9 @@ class FloatingObjectTest {
         Frog offCentre = new Frog(new Vec2(0.5625, 0.5), Rank.RANK_1);
         offCentre.standOn(object);
 
-        object.push(new Vec2(0, 1), 0.25, pond);
+        object.push(new Vec2(0, -1), 0.25, pond);
 
-        assertAt(0.5625, 0.75, offCentre);
+        assertAt(0.5625, 0.25, offCentre);
     }
 
     @Test
@@ -168,6 +168,109 @@ class FloatingObjectTest {
         assertThrows(IllegalArgumentException.class,
                 () -> object.push(new Vec2(1, 0), Double.NaN, pond));
         assertThrows(NullPointerException.class, () -> object.push(null, 0.25, pond));
+        assertThrows(NullPointerException.class, () -> object.push(new Vec2(1, 0), 0.25, null));
         assertAt(0.5, 0.5, object);
+    }
+
+    // Blocked pushes (GDD 3.1). The object is at (0.5, 0.5) with radius 0.125; every push
+    // below is 0.125 to the right, to (0.625, 0.5), unless something is in the way.
+
+    private static final Vec2 RIGHT = new Vec2(1, 0);
+
+    /**
+     * Where a blocker overlaps the object after the push: the object's right edge would
+     * reach 0.75, and a blocker of radius 0.0625 here starts at 0.6875.
+     */
+    private static final Vec2 IN_THE_WAY = new Vec2(0.75, 0.5);
+
+    @Test
+    void aReedClumpInTheWayBlocksThePush() {
+        pond.add(new Reed(IN_THE_WAY, 0.125));
+
+        assertFalse(object.push(RIGHT, 0.125, pond));
+        assertAt(0.5, 0.5, object);
+    }
+
+    @Test
+    void anotherFloatingObjectInTheWayBlocksThePush() {
+        pond.add(object);
+        pond.add(new TestFloat(IN_THE_WAY.getX(), IN_THE_WAY.getY(), 0.125));
+
+        assertFalse(object.push(RIGHT, 0.125, pond));
+        assertAt(0.5, 0.5, object);
+    }
+
+    @Test
+    void aTurtleInTheWayBlocksThePush() {
+        pond.add(new Turtle(IN_THE_WAY, 0.125));
+
+        assertFalse(object.push(RIGHT, 0.125, pond));
+    }
+
+    @Test
+    void theObjectMayComeToRestJustTouchingSomething() {
+        // At (0.625, 0.5) its edge is at 0.75, exactly where the reed's edge starts.
+        pond.add(new Reed(new Vec2(0.8125, 0.5), 0.125));
+
+        assertTrue(object.push(RIGHT, 0.125, pond));
+        assertAt(0.625, 0.5, object);
+    }
+
+    @Test
+    void theObjectDoesNotBlockItself() {
+        pond.add(object);
+
+        assertTrue(object.push(RIGHT, 0.125, pond));
+    }
+
+    @Test
+    void somethingThatIsNotSolidDoesNotBlock() {
+        pond.add(new TestElementThatIsNotSolid(new Vec2(0.6875, 0.5)));
+
+        assertTrue(object.push(RIGHT, 0.125, pond));
+    }
+
+    @Test
+    void aBankInTheWayBlocksThePush() {
+        // Start bank from y about 0.542: the object's bottom edge would go from 0.625 past it.
+        Pond withBanks = new Pond(Balance.PLAY_AREA_WIDTH, Balance.PLAY_AREA_HEIGHT, 0.125, 0.125, frog);
+        FloatingObject nearTheBank = new TestFloat(0.5, 0.375, 0.25);
+
+        assertFalse(nearTheBank.push(new Vec2(0, 1), 0.0625, withBanks));
+        assertAt(0.5, 0.375, nearTheBank);
+    }
+
+    @Test
+    void theSideOfThePlayAreaBlocksThePush() {
+        FloatingObject nearTheSide = new TestFloat(0.875, 0.5, 0.125);
+
+        assertFalse(nearTheSide.push(RIGHT, 0.125, pond));
+    }
+
+    @Test
+    void aBlockedPushLeavesTheRiderWhereItIs() {
+        frog.standOn(object);
+        pond.add(new Reed(IN_THE_WAY, 0.125));
+
+        object.push(RIGHT, 0.125, pond);
+
+        assertAt(0.5, 0.5, frog);
+        assertSame(object, frog.standingOn().orElseThrow());
+    }
+
+    @Test
+    void solidElements() {
+        assertTrue(object.isSolid());
+        assertTrue(new Reed(new Vec2(0, 0), 0.1).isSolid());
+        assertTrue(new Turtle(new Vec2(0, 0), 0.1).isSolid());
+        assertFalse(frog.isSolid());
+        assertFalse(new TestElementThatIsNotSolid(new Vec2(0, 0)).isSolid());
+    }
+
+    /** An element that keeps the default: not solid, like food or an icon. */
+    private static final class TestElementThatIsNotSolid extends AbstractElement {
+        TestElementThatIsNotSolid(Vec2 position) {
+            super(position, 0.125);
+        }
     }
 }
