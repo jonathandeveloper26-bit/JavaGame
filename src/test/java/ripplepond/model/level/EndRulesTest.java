@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import ripplepond.model.Balance;
 import ripplepond.model.element.Frog;
 import ripplepond.model.geometry.Vec2;
 import ripplepond.model.progress.Rank;
@@ -17,28 +16,14 @@ import ripplepond.model.progress.Rank;
 /**
  * Tests for {@link EndRules}: every rule in GDD section 3.2.
  * <p>
- * Two small stand-ins keep the tests independent of other tasks: a pond that reports
- * whichever area the test chooses (the real {@code Pond.areaAt} comes in S3), and a
- * level whose turn counter the test can set (it only goes up when a turn is played,
+ * Two small stand-ins keep the tests independent of other tasks: {@link FakePond}, which
+ * reports whichever area the test chooses (the real {@code Pond.areaAt} comes in S3),
+ * and a level whose turn counter the test can set (it only goes up when a turn is played,
  * which needs the turn engine from S5).
  */
 class EndRulesTest {
 
     private static final int TURN_LIMIT = 40;
-
-    /** A pond whose every point is in the area the test chooses. */
-    private static final class FakePond extends Pond {
-        private AreaType area = AreaType.WATER;
-
-        FakePond(Frog frog) {
-            super(Balance.PLAY_AREA_WIDTH, Balance.PLAY_AREA_HEIGHT, frog);
-        }
-
-        @Override
-        public AreaType areaAt(Vec2 point) {
-            return area;
-        }
-    }
 
     /** A level whose turn counter the test can set. */
     private static final class FakeLevel extends Level {
