@@ -18,6 +18,8 @@ import ripplepond.model.element.Frog;
 import ripplepond.model.element.LilyPad;
 import ripplepond.model.element.Placement;
 import ripplepond.model.element.Reed;
+import ripplepond.model.element.ThrowableKind;
+import ripplepond.model.element.ThrownObject;
 import ripplepond.model.element.Turtle;
 import ripplepond.model.element.pickup.Pickup;
 import ripplepond.model.event.EventType;
@@ -259,10 +261,125 @@ class TurnEngineTest {
         assertEquals(2, level.getTurn());
     }
 
-    // TODO(J4) activation: throws. Add once ThrowableKind.size(), ThrowBag and ThrownObject exist.
-    // A throw onto an occupied spot leaves the bag unchanged; a free spot adds the object,
-    // starts its ripple and publishes OBJECT_THROWN.
-    //
+    // Throws (J4, switched on in J9). The pond is all water; the frog is at (0.5, 0.5).
+
+    private static final Vec2 THROW_SPOT = new Vec2(0.25, 0.25);
+
+    private static Level levelWithBag(Pond pond, ThrowableKind... kinds) {
+        ThrowBag bag = new ThrowBag();
+        for (ThrowableKind kind : kinds) {
+            bag.add(kind);
+        }
+        return new Level(pond, bag, 40, new InProgress());
+    }
+
+    private static TurnAction throwAt(ThrowableKind kind, Vec2 target) {
+        return new TurnAction(kind, target, null, null);
+    }
+
+    @Test
+    void aThrowLandsTheObjectAndTakesItFromTheBag() {
+        Pond pond = emptyPond();
+        Level level = levelWithBag(pond, ThrowableKind.PLANK);
+
+        level.playTurn(throwAt(ThrowableKind.PLANK, THROW_SPOT));
+
+        assertEquals(1, pond.elementsInOrder().size());
+        ThrownObject plank = (ThrownObject) pond.elementsInOrder().get(0);
+        assertEquals(ThrowableKind.PLANK, plank.getKind());
+        assertEquals(THROW_SPOT, plank.getPosition());
+        assertFalse(level.getBag().has(ThrowableKind.PLANK));
+    }
+
+    @Test
+    void aThrowStartsARippleThatSpreadsInTheSameTurn() {
+        Pond pond = emptyPond();
+        Level level = levelWithBag(pond, ThrowableKind.TWIG);
+
+        level.playTurn(throwAt(ThrowableKind.TWIG, THROW_SPOT));
+
+        assertEquals(1, pond.ripples().size());
+        Ripple ripple = pond.ripples().get(0);
+        assertEquals(THROW_SPOT, ripple.getSource());
+        assertEquals(Balance.RIPPLE_GROWTH_PER_TURN, ripple.getRadius(), DELTA);
+    }
+
+    @Test
+    void aThrowPublishesObjectThrown() {
+        Pond pond = emptyPond();
+        Level level = levelWithBag(pond, ThrowableKind.LOG);
+        RecordingListener listener = new RecordingListener();
+        level.addListener(listener);
+
+        level.playTurn(throwAt(ThrowableKind.LOG, THROW_SPOT));
+
+        assertEquals(1, listener.received.size());
+        assertEquals(EventType.OBJECT_THROWN, listener.received.get(0).getType());
+        assertEquals(ThrowableKind.LOG.size(), listener.received.get(0).getAmount(), DELTA);
+    }
+
+    @Test
+    void aThrowWithNothingOfThatKindInTheBagIsRefused() {
+        Pond pond = emptyPond();
+        Level level = levelWithBag(pond, ThrowableKind.TWIG);
+        RecordingListener listener = new RecordingListener();
+        level.addListener(listener);
+
+        level.playTurn(throwAt(ThrowableKind.LOG, THROW_SPOT));
+
+        assertTrue(pond.elementsInOrder().isEmpty());
+        assertTrue(pond.ripples().isEmpty());
+        assertTrue(listener.received.isEmpty());
+        assertTrue(level.getBag().has(ThrowableKind.TWIG));
+    }
+
+    @Test
+    void aThrowOntoAnOccupiedSpotIsRefusedAndKeepsTheObject() {
+        Pond pond = emptyPond();
+        pond.add(new PlainElement(THROW_SPOT, 0.1));
+        Level level = levelWithBag(pond, ThrowableKind.PLANK);
+
+        level.playTurn(throwAt(ThrowableKind.PLANK, new Vec2(0.3, 0.25)));
+
+        assertEquals(1, pond.elementsInOrder().size());
+        assertTrue(level.getBag().has(ThrowableKind.PLANK));
+    }
+
+    @Test
+    void aThrowOntoABankIsRefused() {
+        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, 0.125, 0.125, new Frog(new Vec2(0.5, 0.625), Rank.RANK_1));
+        Level level = levelWithBag(pond, ThrowableKind.PLANK);
+
+        level.playTurn(throwAt(ThrowableKind.PLANK, new Vec2(0.5, 0.0625)));
+
+        assertTrue(pond.elementsInOrder().isEmpty());
+        assertTrue(level.getBag().has(ThrowableKind.PLANK));
+    }
+
+    @Test
+    void aThrowOntoTheFrogIsRefused() {
+        Pond pond = emptyPond();
+        Level level = levelWithBag(pond, ThrowableKind.PLANK);
+
+        level.playTurn(throwAt(ThrowableKind.PLANK, pond.getFrog().getPosition()));
+
+        assertTrue(pond.elementsInOrder().isEmpty());
+    }
+
+    @Test
+    void theFrogCanHopOntoWhatItThrewInTheSameTurn() {
+        // The throw is step 1 and the move step 4, so the plank is already there.
+        Frog frog = new Frog(new Vec2(0.5, 0.5625), Rank.RANK_1);
+        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, 0.125, 0.125, frog);
+        Level level = levelWithBag(pond, ThrowableKind.PLANK);
+        Vec2 plankSpot = new Vec2(0.5, 0.4875);
+
+        level.playTurn(new TurnAction(ThrowableKind.PLANK, plankSpot, new Hop(), plankSpot));
+
+        assertEquals(plankSpot, frog.getPosition());
+        assertTrue(frog.standingOn().isPresent());
+    }
+
     // Frog moves (J6). The pond has banks 0.125 deep and the frog starts on the start
     // bank at (0.5, 0.625).
 

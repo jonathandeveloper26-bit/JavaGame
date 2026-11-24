@@ -24,8 +24,8 @@ class PondTest {
     private static final double BANK = 0.1;
 
     /**
-     * A frog for the pond's constructor, in the top-left corner. Pond does not check
-     * the frog's position yet (isFree's frog check waits on J2 being wired in).
+     * A frog for the pond's constructor, in the top-left corner, out of the way of the
+     * spots these tests check.
      */
     private static Frog frog() {
         return new Frog(new Vec2(0, 0), Rank.RANK_1);
@@ -71,6 +71,16 @@ class PondTest {
     @Test
     void isFreeRejectsCircleOnABank() {
         assertFalse(pond().isFree(new Vec2(0.5, 0.05), 0.1));
+    }
+
+    @Test
+    void isFreeRejectsTheSpotWhereTheFrogIs() {
+        // A swimming frog in the middle of the river.
+        Pond pond = new Pond(1, HEIGHT, BANK, BANK, new Frog(new Vec2(0.5, 0.3), Rank.RANK_3));
+
+        assertFalse(pond.isFree(new Vec2(0.5, 0.3), 0.1));
+        assertFalse(pond.isFree(new Vec2(0.5, 0.37), 0.1));
+        assertTrue(pond.isFree(new Vec2(0.5, 0.45), 0.1));
     }
 
     @Test

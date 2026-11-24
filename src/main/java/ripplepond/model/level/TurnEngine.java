@@ -6,10 +6,13 @@ import java.util.Objects;
 import ripplepond.model.Balance;
 import ripplepond.model.element.Element;
 import ripplepond.model.element.Frog;
+import ripplepond.model.element.ThrowableKind;
+import ripplepond.model.element.ThrownObject;
 import ripplepond.model.element.pickup.Pickup;
 import ripplepond.model.event.EventType;
 import ripplepond.model.event.GameEvent;
 import ripplepond.model.geometry.Vec2;
+import ripplepond.model.ripple.CircularSpread;
 import ripplepond.model.ripple.Ripple;
 
 /**
@@ -29,8 +32,6 @@ public class TurnEngine {
      * @param level  the level being played
      * @param action what the player asked for this turn
      * @throws NullPointerException if either argument is {@code null}
-     * @throws UnsupportedOperationException if the action asks for a throw, until the
-     *         throw step is switched on
      */
     public void runTurn(Level level, TurnAction action) {
         Objects.requireNonNull(level, "level");
@@ -44,34 +45,33 @@ public class TurnEngine {
     }
 
     /**
-     * Step 1: places the thrown object and starts its ripple. A throw onto an occupied spot
-     * is refused before the bag is touched, so no object is lost.
+     * Step 1: places the thrown object and starts its ripple (GDD 3, step 1).
+     * <p>
+     * The object lands where the player aimed, with the usual size for its kind, and a
+     * ripple starts there; it spreads in step 2 of the same turn. The throw publishes
+     * {@code OBJECT_THROWN}, with the object's diameter as the amount.
+     * <p>
+     * A throw is refused, and nothing changes, if the bag holds no object of that kind or
+     * the spot is not free open water with room for it. Both are checked before the bag
+     * is touched, so a refused throw never loses an object.
      *
      * @param level  the level being played
      * @param action the action containing the throw, if any
-     * @throws UnsupportedOperationException if the action has a throw, until J4 is merged
      */
     protected void throwStep(Level level, TurnAction action) {
         if (!action.hasThrow()) {
             return;
         }
-        // TODO(J4): once ThrowableKind.size(), ThrowBag.has/take and ThrownObject exist,
-        // replace the throw below with:
-        //
-        // Pond pond = level.getPond();
-        // Vec2 target = action.getThrowTarget();
-        // double size = action.getThrowKind().size();
-        // if (!pond.isFree(target, size)) {
-        //     return;
-        // }
-        // if (!level.getBag().has(action.getThrowKind())) {
-        //     return;
-        // }
-        // ThrownObject thrown = level.getBag().take(action.getThrowKind());
-        // pond.add(thrown);
-        // pond.addRipple(new Ripple(target, thrown, new CircularSpread()));
-        // level.publish(new GameEvent(EventType.OBJECT_THROWN, thrown, size));
-        throw new UnsupportedOperationException("A throw waits for J4: ThrowBag and ThrowableKind.size()");
+        Pond pond = level.getPond();
+        ThrowableKind kind = action.getThrowKind();
+        Vec2 target = action.getThrowTarget();
+        if (!level.getBag().has(kind) || !pond.isFree(target, kind.size())) {
+            return;
+        }
+        ThrownObject thrown = level.getBag().take(kind, target);
+        pond.add(thrown);
+        pond.addRipple(new Ripple(target, thrown, new CircularSpread()));
+        level.publish(new GameEvent(EventType.OBJECT_THROWN, thrown, kind.size()));
     }
 
     /**

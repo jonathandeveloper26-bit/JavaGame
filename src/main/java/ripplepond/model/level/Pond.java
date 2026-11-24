@@ -143,7 +143,8 @@ public class Pond {
 
     /**
      * Returns {@code true} if an element of the given diameter can be placed with its centre
-     * at {@code point}: the whole circle lies in the water and touches no element.
+     * at {@code point}: the whole circle lies in the water and touches no element and not
+     * the frog.
      * <p>
      * Touching uses the same rule as {@link Element#touches}, so a circle that only just
      * touches another is not free.
@@ -171,9 +172,11 @@ public class Pond {
                 return false;
             }
         }
-        //if (point.distanceTo(frog.getPosition()) <= radius + frog.getRadius()) {
-        //    return false;
-        //}
+        // The frog is not one of the elements, so it is checked on its own. Some test
+        // ponds have no frog.
+        if (frog != null && point.distanceTo(frog.getPosition()) <= radius + frog.getRadius()) {
+            return false;
+        }
         return true;
     }
 

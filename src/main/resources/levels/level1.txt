@@ -1,0 +1,18 @@
+# Level 1 - First crossing
+# Owner: Jonathan (J9). Teaches throwing and hopping.
+#
+# The river is about 0.43 wide and a new frog hops at most 0.10, so the only way across
+# is to throw something to land on. A generous bag, no predators, nothing to dodge.
+#
+# One way to win (LevelsTest plays it): walk to the edge, then throw a twig about 0.09
+# ahead and hop onto the one before it, four times, then hop onto the far bank. Each
+# throw's ripple pushes the twig behind it back towards the start, but the bank or the
+# twig behind it always blocks the push.
+
+turns 25
+bank far 0.12         # top strip: y from 0 to 0.12
+bank start 0.12       # bottom strip: y from about 0.547 to 0.667
+frog 0.50 0.58        # a short walk from the water's edge
+
+bag twig 6
+bag plank 2
