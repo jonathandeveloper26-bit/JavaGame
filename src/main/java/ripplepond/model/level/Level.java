@@ -2,6 +2,7 @@ package ripplepond.model.level;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import ripplepond.model.event.GameEvent;
 import ripplepond.model.event.PondListener;
@@ -17,6 +18,7 @@ public class Level {
     private LevelState state;
     private int turn;
     private final List<PondListener> listeners = new ArrayList<>();
+    private final TurnEngine engine = new TurnEngine();
 
     /**
      * Creates a level at turn 0.
@@ -27,21 +29,29 @@ public class Level {
      * @param state     the state the level starts in
      */
     public Level(Pond pond, ThrowBag bag, int turnLimit, LevelState state) {
-        this.pond = pond;
-        this.bag = bag;
+        this.pond = Objects.requireNonNull(pond, "pond");
+        this.bag = Objects.requireNonNull(bag, "bag");
         this.turnLimit = turnLimit;
         this.state = state;
         this.turn = 0;
     }
 
     /**
-     * Plays one turn. Implemented in S5.
+     * Plays one turn. The turn counter goes up by one before the engine runs.
+     * <p>
+     * TODO(J3): once {@code LevelState.playTurn} exists, replace the direct engine call with
+     * the state delegation below, which lets a won or lost level refuse turns.
+     * <pre>
+     * // state = state.playTurn(this, action);
+     * </pre>
      *
      * @param action what the player asked for this turn
-     * @throws UnsupportedOperationException until S5 is merged
+     * @throws NullPointerException if {@code action} is {@code null}
      */
     public void playTurn(TurnAction action) {
-        throw new UnsupportedOperationException("Implemented in S5");
+        Objects.requireNonNull(action, "action");
+        turn++;
+        engine.runTurn(this, action);
     }
 
     /** Returns the current state: in progress, won or lost. */
@@ -73,17 +83,20 @@ public class Level {
      * Registers a listener to receive every event this level publishes.
      *
      * @param listener the listener to add
+     * @throws NullPointerException if {@code listener} is {@code null}
      */
     public void addListener(PondListener listener) {
-        listeners.add(listener);
+        listeners.add(Objects.requireNonNull(listener, "listener"));
     }
 
     /**
      * Sends an event to every registered listener, in the order they were added.
      *
      * @param event the event to send
+     * @throws NullPointerException if {@code event} is {@code null}
      */
     public void publish(GameEvent event) {
+        Objects.requireNonNull(event, "event");
         for (PondListener listener : listeners) {
             listener.onEvent(event);
         }

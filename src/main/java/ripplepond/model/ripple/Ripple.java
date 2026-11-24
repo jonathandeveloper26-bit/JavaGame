@@ -118,16 +118,19 @@ public final class Ripple {
     }
 
     /** @return the point where the ripple started */
+    public Vec2 getSource() {
     Vec2 getSource() {
         return source;
     }
 
     /** @return the current radius, in play-area widths */
+    public double getRadius() {
     double getRadius() {
         return radius;
     }
 
     /** @return the radius before the last spread step */
+    public double getPreviousRadius() {
     double getPreviousRadius() {
         return previousRadius;
     }
