@@ -50,6 +50,15 @@ public final class Balance {
     /** Default diameter of a throwable icon in a level file, in play-area widths. [proposed] */
     public static final double ICON_SIZE = 0.04;
 
+    /** Default diameter of a fly in a level file, in play-area widths. [proposed] */
+    public static final double FLY_SIZE = 0.025;
+
+    /** Default diameter of a small minnow in a level file, in play-area widths. [proposed] */
+    public static final double MINNOW_SIZE = 0.03;
+
+    /** Default diameter of a breadcrumb in a level file, in play-area widths. [proposed] */
+    public static final double BREADCRUMB_SIZE = 0.025;
+
     /** Moves are charged per this distance travelled, in play-area widths (GDD 4.2). [proposed] */
     public static final double MOVE_UNIT = 0.10;
 
@@ -76,4 +85,16 @@ public final class Balance {
 
     /** XP for each whole point of energy the frog has left at the end of a level. [proposed] */
     public static final int XP_PER_ENERGY_LEFT = 1;
+
+    /** Health a fly restores (GDD 2.5). [proposed] */
+    public static final int FLY_HEALTH = 2;
+
+    /** Energy a fly restores (GDD 2.5). [proposed] */
+    public static final double FLY_ENERGY = 4;
+
+    /** Energy a small minnow restores (GDD 2.5). [proposed] */
+    public static final double MINNOW_ENERGY = 5;
+
+    /** Health a breadcrumb restores (GDD 2.5). [proposed] */
+    public static final int BREADCRUMB_HEALTH = 3;
 }
