@@ -1,0 +1,40 @@
+# Level 5 - The long swim
+# Owner: Jonathan (X4, taken over from Xaryab). The hardest level.
+#
+# Designed for a rank 3 frog (hop 0.14, can swim), the usual rank by now. The river is
+# about 0.51 wide and the bag holds only two twigs.
+#
+# Pad P1 is one long hop from the bank. Pad P2 lies beyond hop range, and a reed clump
+# shadows it: a twig thrown straight above P2 sends a ripple the reed blocks. Throw from
+# the side instead, and the ripple pushes P2 into reach a turn later. From P2 there are
+# no more pads: swim the rest, past a fly, and climb out onto the far bank. Swimming
+# costs four times the energy of a walk.
+#
+# Balancing note: until the predators are in, a rank 3 frog can also swim the whole river
+# for about 22 of its 28 energy, skipping the pad puzzle. The fish should make that too
+# dangerous; check at the balancing session.
+#
+# One way to win (LevelsTest plays it): throw a twig at (0.419, 0.126) and walk to the
+# edge; hop to P1; hop to P2 once it is pushed; swim to (0.52, 0.26), (0.52, 0.165) and
+# out at (0.52, 0.075).
+
+turns 15
+bank far 0.08         # top strip: y from 0 to 0.08
+bank start 0.08       # bottom strip: y from about 0.587 to 0.667
+frog 0.50 0.62
+
+lilypad 0.50 0.46 0.08       # P1: one long hop from the bank
+lilypad 0.46 0.27 0.08       # P2: out of reach until pushed
+reed    0.47 0.20 0.05       # shadows P2 from straight above
+turtle  0.62 0.22 0.07       # asleep beside the swim lane
+
+breadcrumb 0.50 0.595        # at the water's edge
+minnow     0.50 0.46         # on P1
+fly        0.52 0.165        # on the swim route
+
+# Predators, once Stephan's S6 registers them in the ElementFactory:
+# snake 0.20 0.04            # on the far bank
+# bird  0.80 0.30            # over the water
+# fish  0.35 0.40            # in the water
+
+bag twig 2
