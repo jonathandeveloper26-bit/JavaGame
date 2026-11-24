@@ -5,6 +5,10 @@ import java.util.Objects;
 
 import ripplepond.model.Balance;
 import ripplepond.model.element.Element;
+import ripplepond.model.element.Frog;
+import ripplepond.model.element.pickup.Pickup;
+import ripplepond.model.event.EventType;
+import ripplepond.model.event.GameEvent;
 import ripplepond.model.geometry.Vec2;
 import ripplepond.model.ripple.Ripple;
 
@@ -25,8 +29,8 @@ public class TurnEngine {
      * @param level  the level being played
      * @param action what the player asked for this turn
      * @throws NullPointerException if either argument is {@code null}
-     * @throws UnsupportedOperationException if the action asks for a throw or a frog move
-     *         before J4 or J6 is merged
+     * @throws UnsupportedOperationException if the action asks for a throw, until the
+     *         throw step is switched on
      */
     public void runTurn(Level level, TurnAction action) {
         Objects.requireNonNull(level, "level");
@@ -152,24 +156,43 @@ public class TurnEngine {
     }
 
     /**
-     * Step 4: makes the frog's move if the action has one. The frog checks the rules and the
-     * energy cost itself (J6).
+     * Step 4: makes the frog's move if the action has one (GDD 4.2). The frog checks the
+     * rules and the energy cost itself, and refuses a move it may not make.
+     * <p>
+     * A move that happens publishes {@code FROG_MOVED}, with the distance travelled as
+     * its amount. Then the frog collects every pickup it touches: food and throwable
+     * icons (GDD section 3, step 4). A refused move publishes nothing and collects
+     * nothing.
      *
      * @param level  the level being played
      * @param action the action containing the move, if any
-     * @throws UnsupportedOperationException if the action has a move, until J6 is merged
      */
     protected void frogMoves(Level level, TurnAction action) {
         if (!action.hasMove()) {
             return;
         }
-        // TODO(J6): once Frog.move and MoveMode.isLegal exist, replace the throw with:
-        //
-        // Frog frog = level.getPond().getFrog();
-        // if (frog.move(action.getMoveMode(), action.getMoveTarget(), level.getPond())) {
-        //     level.publish(new GameEvent(EventType.FROG_MOVED, frog, 0));
-        // }
-        throw new UnsupportedOperationException("A frog move waits for J6: Frog.move and MoveMode.isLegal");
+        Pond pond = level.getPond();
+        Frog frog = pond.getFrog();
+        double distance = frog.getPosition().distanceTo(action.getMoveTarget());
+        if (frog.move(action.getMoveMode(), action.getMoveTarget(), pond)) {
+            level.publish(new GameEvent(EventType.FROG_MOVED, frog, distance));
+            collectPickups(level, frog);
+        }
+    }
+
+    /**
+     * Gives the frog every pickup it touches. The list is a copy, so a pickup can remove
+     * itself from the pond while it is collected.
+     *
+     * @param level the level being played
+     * @param frog  the frog that just moved
+     */
+    private void collectPickups(Level level, Frog frog) {
+        for (Element element : level.getPond().elementsInOrder()) {
+            if (element instanceof Pickup pickup && frog.touches(pickup)) {
+                pickup.collect(frog, level);
+            }
+        }
     }
 
     /**

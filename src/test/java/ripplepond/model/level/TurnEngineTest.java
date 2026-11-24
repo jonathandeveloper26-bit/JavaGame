@@ -2,6 +2,8 @@ package ripplepond.model.level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -13,9 +15,15 @@ import org.junit.jupiter.api.Test;
 import ripplepond.model.Balance;
 import ripplepond.model.element.Element;
 import ripplepond.model.element.Frog;
+import ripplepond.model.element.pickup.Pickup;
+import ripplepond.model.event.EventType;
 import ripplepond.model.event.GameEvent;
 import ripplepond.model.event.PondListener;
 import ripplepond.model.geometry.Vec2;
+import ripplepond.model.movement.Hop;
+import ripplepond.model.movement.MoveMode;
+import ripplepond.model.movement.Swim;
+import ripplepond.model.movement.Walk;
 import ripplepond.model.progress.Rank;
 import ripplepond.model.ripple.CircularSpread;
 import ripplepond.model.ripple.Ripple;
@@ -250,9 +258,104 @@ class TurnEngineTest {
     // A throw onto an occupied spot leaves the bag unchanged; a free spot adds the object,
     // starts its ripple and publishes OBJECT_THROWN.
     //
-    // TODO(J6) activation: frog moves. Add once Frog.move and MoveMode.isLegal exist.
-    // A legal move publishes FROG_MOVED; an illegal or unaffordable move leaves the frog where it is.
-    //
+    // Frog moves (J6). The pond has banks 0.125 deep and the frog starts on the start
+    // bank at (0.5, 0.625).
+
+    private static final Vec2 FROG_START = new Vec2(0.5, 0.625);
+    private static final Vec2 ALONG_THE_BANK = new Vec2(0.5625, 0.625);
+
+    /** A pickup that records which frog collected it and then leaves the pond. */
+    private static final class RecordingPickup extends Pickup {
+        private Frog collectedBy;
+
+        RecordingPickup(Vec2 position) {
+            super(position, 0.03125);
+        }
+
+        @Override
+        public void collect(Frog frog, Level level) {
+            collectedBy = frog;
+            level.getPond().remove(this);
+        }
+    }
+
+    private static Pond pondWithBanks() {
+        return new Pond(Pond.WIDTH, Pond.HEIGHT, 0.125, 0.125, new Frog(FROG_START, Rank.RANK_1));
+    }
+
+    private static TurnAction move(MoveMode mode, Vec2 target) {
+        return new TurnAction(null, null, mode, target);
+    }
+
+    @Test
+    void aLegalMoveMovesTheFrogAndPublishesFrogMoved() {
+        Pond pond = pondWithBanks();
+        Level level = levelOn(pond);
+        RecordingListener listener = new RecordingListener();
+        level.addListener(listener);
+
+        level.playTurn(move(new Walk(), ALONG_THE_BANK));
+
+        assertEquals(ALONG_THE_BANK, pond.getFrog().getPosition());
+        assertEquals(1, listener.received.size());
+        GameEvent event = listener.received.get(0);
+        assertEquals(EventType.FROG_MOVED, event.getType());
+        assertSame(pond.getFrog(), event.getSubject());
+        assertEquals(0.0625, event.getAmount(), DELTA);
+    }
+
+    @Test
+    void anIllegalMoveLeavesTheFrogWhereItIsAndPublishesNothing() {
+        Pond pond = pondWithBanks();
+        Level level = levelOn(pond);
+        RecordingListener listener = new RecordingListener();
+        level.addListener(listener);
+
+        // A rank 1 frog cannot swim.
+        level.playTurn(move(new Swim(), new Vec2(0.5, 0.53125)));
+
+        assertEquals(FROG_START, pond.getFrog().getPosition());
+        assertTrue(listener.received.isEmpty());
+    }
+
+    @Test
+    void anUnaffordableMoveLeavesTheFrogWhereItIs() {
+        Pond pond = pondWithBanks();
+        pond.getFrog().spendEnergy(19.5);
+
+        levelOn(pond).playTurn(move(new Walk(), new Vec2(0.5875, 0.625)));
+
+        assertEquals(FROG_START, pond.getFrog().getPosition());
+    }
+
+    @Test
+    void afterMovingTheFrogCollectsThePickupsItTouches() {
+        Pond pond = pondWithBanks();
+        RecordingPickup touched = new RecordingPickup(new Vec2(0.59375, 0.625));
+        RecordingPickup farAway = new RecordingPickup(new Vec2(0.75, 0.625));
+        pond.add(touched);
+        pond.add(farAway);
+
+        levelOn(pond).playTurn(move(new Walk(), ALONG_THE_BANK));
+
+        assertSame(pond.getFrog(), touched.collectedBy);
+        assertFalse(pond.elementsInOrder().contains(touched));
+        assertNull(farAway.collectedBy);
+        assertTrue(pond.elementsInOrder().contains(farAway));
+    }
+
+    @Test
+    void aRefusedMoveCollectsNothing() {
+        Pond pond = pondWithBanks();
+        // Touching the frog where it stands, but the frog does not move.
+        RecordingPickup underTheFrog = new RecordingPickup(FROG_START);
+        pond.add(underTheFrog);
+
+        levelOn(pond).playTurn(move(new Hop(), new Vec2(0.5, 0.53125)));
+
+        assertNull(underTheFrog.collectedBy);
+    }
+
     // TODO(J8) activation: pushes that move elements. Add once FloatingObject.push exists.
     // A floating object moves by the pushStep displacement and publishes OBJECT_PUSHED.
     //
