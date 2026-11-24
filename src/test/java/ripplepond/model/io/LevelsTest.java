@@ -7,8 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import ripplepond.model.element.Element;
 import ripplepond.model.element.Frog;
+import ripplepond.model.element.LilyPad;
 import ripplepond.model.element.ThrowableKind;
+import ripplepond.model.element.Turtle;
+import ripplepond.model.element.pickup.ThrowableIcon;
 import ripplepond.model.geometry.Vec2;
 import ripplepond.model.level.InProgress;
 import ripplepond.model.level.Level;
@@ -95,5 +99,72 @@ class LevelsTest {
         assertEquals(10, frog.getHealth());
         assertEquals(2, level.getBag().count(ThrowableKind.TWIG));
         assertFalse(level.getBag().isEmpty());
+    }
+
+    // Level 2
+
+    private static final Vec2 PAD_A = new Vec2(0.50, 0.47);
+    private static final Vec2 PAD_B_START = new Vec2(0.50, 0.30);
+    private static final Vec2 PAD_B_PUSHED = new Vec2(0.50, 0.38);
+
+    private static Element elementAt(Level level, Class<? extends Element> type, int index) {
+        return level.getPond().elementsInOrder().stream().filter(type::isInstance).toList().get(index);
+    }
+
+    @Test
+    void levelTwoLoadsWithPadsATurtleAndAnIcon() throws LevelFormatException {
+        Level level = loader.load("levels/level2.txt", Rank.RANK_1);
+
+        assertEquals(20, level.getTurnLimit());
+        assertEquals(3, level.getBag().count(ThrowableKind.TWIG));
+        assertEquals(2, level.getPond().elementsInOrder().stream().filter(LilyPad.class::isInstance).count());
+        assertEquals(1, level.getPond().elementsInOrder().stream().filter(Turtle.class::isInstance).count());
+        assertEquals(1, level.getPond().elementsInOrder().stream().filter(ThrowableIcon.class::isInstance).count());
+    }
+
+    @Test
+    void levelTwoPadBIsOutOfReachUntilARipplePushesIt() throws LevelFormatException {
+        Level level = loader.load("levels/level2.txt", Rank.RANK_1);
+        Frog frog = level.getPond().getFrog();
+        play(level, move(new Walk(), new Vec2(0.50, 0.56)), new Vec2(0.50, 0.56));
+        play(level, move(new Hop(), PAD_A), PAD_A);
+
+        level.playTurn(move(new Hop(), PAD_B_START));
+
+        assertEquals(PAD_A, frog.getPosition());
+    }
+
+    @Test
+    void levelTwoCanBeWonWithItsStartingBag() throws LevelFormatException {
+        Level level = loader.load("levels/level2.txt", Rank.RANK_1);
+        Hop hop = new Hop();
+        Vec2 twig1 = new Vec2(0.50, 0.215);
+        Vec2 twig2 = new Vec2(0.50, 0.295);
+        Vec2 edge = new Vec2(0.50, 0.56);
+        Vec2 farBank = new Vec2(0.50, 0.118);
+        Turtle turtle = (Turtle) elementAt(level, Turtle.class, 0);
+        LilyPad padB = (LilyPad) elementAt(level, LilyPad.class, 0);
+        assertEquals(PAD_B_START, padB.getPosition());
+
+        // Throw beyond pad B: its ripple pushes B towards A. Walk to the edge.
+        play(level, throwAndMove(ThrowableKind.TWIG, twig1, new Walk(), edge), edge);
+        assertEquals(PAD_B_PUSHED.getY(), padB.getPosition().getY(), 1e-9);
+
+        // Hop onto A, picking up the plank icon on it. The ripple wakes the turtle.
+        play(level, move(hop, PAD_A), PAD_A);
+        assertEquals(1, level.getBag().count(ThrowableKind.PLANK));
+        assertTrue(turtle.isAwake());
+
+        // Throw the second twig between B and the first one, then hop along.
+        play(level, throwAndMove(ThrowableKind.TWIG, twig2, hop, PAD_B_PUSHED), PAD_B_PUSHED);
+        play(level, move(hop, twig2), twig2);
+        play(level, move(hop, twig1), twig1);
+        play(level, move(hop, farBank), farBank);
+
+        assertInstanceOf(Won.class, level.getState());
+        assertEquals(6, level.getTurn());
+        Frog frog = level.getPond().getFrog();
+        assertTrue(frog.getEnergy() > 10, "energy left: " + frog.getEnergy());
+        assertEquals(1, level.getBag().count(ThrowableKind.TWIG));
     }
 }
