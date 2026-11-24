@@ -1,0 +1,5 @@
+turns 40
+bank far 0.10
+bank start 0.10
+frog 0.50 0.62
+reed 1.20 0.30
