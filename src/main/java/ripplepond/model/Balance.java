@@ -25,4 +25,15 @@ public final class Balance {
 
     /** How many turns a ripple keeps spreading before it fades (GDD 3.1). */
     public static final int RIPPLE_TURNS = 3;
+    /** Diameter of the frog, in play-area widths. [proposed] */
+    public static final double FROG_SIZE = 0.04;
+
+    /** Diameter of a thrown twig, in play-area widths. [proposed] */
+    public static final double TWIG_SIZE = 0.05;
+
+    /** Diameter of a thrown plank, in play-area widths. [proposed] */
+    public static final double PLANK_SIZE = 0.10;
+
+    /** Diameter of a thrown log, in play-area widths. [proposed] */
+    public static final double LOG_SIZE = 0.18;
 }
