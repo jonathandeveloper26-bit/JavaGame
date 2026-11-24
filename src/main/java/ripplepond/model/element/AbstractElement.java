@@ -3,8 +3,7 @@ package ripplepond.model.element;
 import java.util.Objects;
 
 import ripplepond.model.geometry.Vec2;
-import ripplepond.model.level.Pond;
-import ripplepond.model.ripple.Ripple;
+import ripplepond.model.level.Level;
 
 /**
  * Base class for everything that sits in the pond.
@@ -13,10 +12,12 @@ import ripplepond.model.ripple.Ripple;
  * diameter. Both are measured in play-area widths (GDD section 2.1), so they do not
  * depend on the size of the window.
  * <p>
- * Reacting to a ripple uses the Template method pattern: {@link #reactTo} is the fixed
+ * Reacting to ripples uses the Template method pattern: {@link #reactTo} is the fixed
  * part, written once here and declared {@code final}, and subclasses only fill in
  * {@link #onRipple}. A floating object is pushed, a turtle wakes up, and every other
- * element keeps the default, which does nothing.
+ * element keeps the default, which does nothing. Which ripples passed and how their
+ * pushes add up is decided by the turn engine, so every element reacts to the same,
+ * combined push.
  */
 public abstract class AbstractElement implements Element {
 
@@ -95,28 +96,29 @@ public abstract class AbstractElement implements Element {
     }
 
     /**
-     * Lets this element react to a ripple. This is the fixed part of the Template
-     * method: it asks the ripple whether its ring passes this element this turn and,
-     * only if it does, calls {@link #onRipple}. Subclasses cannot change this order.
+     * Lets this element react to the ripples that reached it this turn. This is the
+     * fixed part of the Template method: it checks its arguments, then hands the push to
+     * {@link #onRipple}. Subclasses cannot change it, only what {@code onRipple} does.
      *
-     * @param ripple the ripple to react to
-     * @param pond   the pond the element is in
+     * @param push  the combined push of every ripple that passed this element this turn
+     * @param level the level being played
+     * @throws NullPointerException if {@code push} or {@code level} is {@code null}
      */
     @Override
-    public final void reactTo(Ripple ripple, Pond pond) {
-        if (ripple.passes(this, pond)) {
-            onRipple(ripple, pond);
-        }
+    public final void reactTo(Vec2 push, Level level) {
+        Objects.requireNonNull(push, "push");
+        Objects.requireNonNull(level, "level");
+        onRipple(push, level);
     }
 
     /**
-     * What this element does when a ripple's ring passes it. The default does nothing;
-     * subclasses that move or change when a ripple reaches them override it.
+     * What this element does when ripples reach it. The default does nothing; subclasses
+     * that move or change when a ripple reaches them override it.
      *
-     * @param ripple the ripple whose ring passed this element
-     * @param pond   the pond the element is in
+     * @param push  the combined push, at most one push distance long; can be zero
+     * @param level the level being played, to see the pond and publish events
      */
-    protected void onRipple(Ripple ripple, Pond pond) {
+    protected void onRipple(Vec2 push, Level level) {
         // Most elements ignore ripples.
     }
 

@@ -27,6 +27,16 @@ public final class Reed extends AbstractElement {
     }
 
     /**
+     * Returns {@code true}: a reed clump blocks floating objects and turtles.
+     *
+     * @return {@code true}
+     */
+    @Override
+    public boolean isSolid() {
+        return true;
+    }
+
+    /**
      * Returns {@code true} when the straight segment from {@code from} to {@code to}
      * passes through this clump.
      * <p>

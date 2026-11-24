@@ -11,9 +11,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import ripplepond.model.Balance;
 import ripplepond.model.element.Element;
 import ripplepond.model.element.Frog;
 import ripplepond.model.element.ThrowableKind;
+import ripplepond.model.element.pickup.ThrowableIcon;
 import ripplepond.model.geometry.Vec2;
 import ripplepond.model.level.AreaType;
 import ripplepond.model.level.InProgress;
@@ -31,7 +33,8 @@ import ripplepond.model.progress.Rank;
  * a level can be won.
  * <p>
  * Element types come from an {@link ElementFactory}, so a new type only needs to be
- * registered there. Throwable icons ({@code icon <kind> <x> <y>}) are added in J8.
+ * registered there. Throwable icons ({@code icon <kind> <x> <y> [diameter]}) name their
+ * kind before the position, so the loader reads them itself.
  */
 public class LevelLoader {
 
@@ -125,9 +128,21 @@ public class LevelLoader {
             case "bank" -> draft.setBank(line);
             case "frog" -> draft.setFrog(line);
             case "bag" -> draft.addToBag(line);
-            case "icon" -> throw line.error("throwable icons are not available yet (J8)");
+            case "icon" -> readIcon(draft, line);
             default -> readElement(draft, line);
         }
+    }
+
+    /**
+     * Reads a throwable icon line: {@code icon <kind> <x> <y> [diameter]}. The kind comes
+     * before the position, so icons are read here rather than by the factory.
+     */
+    private void readIcon(LevelDraft draft, Line line) throws LevelFormatException {
+        line.requireValues(3, 4);
+        ThrowableKind kind = LevelDraft.kindNamed(line, line.word(1));
+        Vec2 position = line.position(2);
+        double size = line.valueCount() == 4 ? line.size(4) : Balance.ICON_SIZE;
+        draft.addElement(new ThrowableIcon(position, kind, size));
     }
 
     /**

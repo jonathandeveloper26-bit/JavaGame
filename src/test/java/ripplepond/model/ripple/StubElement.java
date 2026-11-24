@@ -2,7 +2,7 @@ package ripplepond.model.ripple;
 
 import ripplepond.model.element.Element;
 import ripplepond.model.geometry.Vec2;
-import ripplepond.model.level.Pond;
+import ripplepond.model.level.Level;
 
 /**
  * A minimal element for ripple tests. It has a position and a size and ignores ripples.
@@ -45,7 +45,7 @@ final class StubElement implements Element {
     }
 
     @Override
-    public void reactTo(Ripple ripple, Pond pond) {
+    public void reactTo(Vec2 push, Level level) {
         // A stub does nothing when a ripple passes it.
     }
 }

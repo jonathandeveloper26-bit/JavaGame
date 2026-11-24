@@ -15,6 +15,10 @@ import org.junit.jupiter.api.Test;
 import ripplepond.model.Balance;
 import ripplepond.model.element.Element;
 import ripplepond.model.element.Frog;
+import ripplepond.model.element.LilyPad;
+import ripplepond.model.element.Placement;
+import ripplepond.model.element.Reed;
+import ripplepond.model.element.Turtle;
 import ripplepond.model.element.pickup.Pickup;
 import ripplepond.model.event.EventType;
 import ripplepond.model.event.GameEvent;
@@ -39,10 +43,11 @@ class TurnEngineTest {
     private static final double DELTA = 1e-12;
     private static final TurnAction NOTHING = new TurnAction(null, null, null, null);
 
-    /** A plain element for these tests. It never moves and ignores ripples. */
+    /** A plain element for these tests. It never moves; it records the pushes it gets. */
     private static final class PlainElement implements Element {
         private final Vec2 position;
         private final double size;
+        private final List<Vec2> pushes = new ArrayList<>();
 
         PlainElement(Vec2 position, double size) {
             this.position = position;
@@ -75,8 +80,8 @@ class TurnEngineTest {
         }
 
         @Override
-        public void reactTo(Ripple ripple, Pond pond) {
-            // Stub: ignores ripples.
+        public void reactTo(Vec2 push, Level level) {
+            pushes.add(push);
         }
     }
 
@@ -356,8 +361,157 @@ class TurnEngineTest {
         assertNull(underTheFrog.collectedBy);
     }
 
-    // TODO(J8) activation: pushes that move elements. Add once FloatingObject.push exists.
-    // A floating object moves by the pushStep displacement and publishes OBJECT_PUSHED.
-    //
+    // Ripples reacting (J8). The element sits at (0.5, 0.4) with radius 0.05, so a ripple
+    // 0.1 from its centre reaches its nearest edge (0.05 away) in the first spread step.
+
+    private static final Vec2 TARGET = new Vec2(0.5, 0.4);
+
+    /** A ripple 0.1 from the target, coming from the given direction (angle from straight up). */
+    private static Ripple rippleTowardsTarget(double degreesFromAbove) {
+        double angle = Math.toRadians(degreesFromAbove);
+        Vec2 source = TARGET.minus(new Vec2(Math.sin(angle), Math.cos(angle)).scale(0.1));
+        return rippleAt(source);
+    }
+
+    @Test
+    void aRipplePushesAnElementOnePushDistanceAwayFromItsSource() {
+        Pond pond = emptyPond();
+        PlainElement element = new PlainElement(TARGET, 0.1);
+        pond.add(element);
+        pond.addRipple(rippleAt(new Vec2(0.5, 0.3)));
+
+        levelOn(pond).playTurn(NOTHING);
+
+        assertEquals(1, element.pushes.size());
+        assertEquals(0, element.pushes.get(0).getX(), DELTA);
+        assertEquals(Balance.RIPPLE_PUSH_DISTANCE, element.pushes.get(0).getY(), DELTA);
+    }
+
+    @Test
+    void anElementNoRippleReachesIsNotAsked() {
+        Pond pond = emptyPond();
+        PlainElement farAway = new PlainElement(new Vec2(0.1, 0.1), 0.05);
+        pond.add(farAway);
+        pond.addRipple(rippleAt(new Vec2(0.9, 0.6)));
+
+        levelOn(pond).playTurn(NOTHING);
+
+        assertTrue(farAway.pushes.isEmpty());
+    }
+
+    @Test
+    void twoRipplesAtRightAnglesStillPushOnlyOnePushDistance() {
+        Pond pond = emptyPond();
+        PlainElement element = new PlainElement(TARGET, 0.1);
+        pond.add(element);
+        pond.addRipple(rippleTowardsTarget(0));
+        pond.addRipple(rippleTowardsTarget(90));
+
+        levelOn(pond).playTurn(NOTHING);
+
+        Vec2 push = element.pushes.get(0);
+        assertEquals(Balance.RIPPLE_PUSH_DISTANCE, push.length(), DELTA);
+        assertEquals(push.getX(), push.getY(), DELTA);
+    }
+
+    @Test
+    void ripplesFromAlmostOppositeSidesMostlyCancel() {
+        // 150 degrees apart: each pushes 0.08, together only 0.08 x 0.5176, about 0.041.
+        Pond pond = emptyPond();
+        PlainElement element = new PlainElement(TARGET, 0.1);
+        pond.add(element);
+        pond.addRipple(rippleTowardsTarget(0));
+        pond.addRipple(rippleTowardsTarget(150));
+
+        levelOn(pond).playTurn(NOTHING);
+
+        double expected = Balance.RIPPLE_PUSH_DISTANCE * 2 * Math.cos(Math.toRadians(75));
+        assertEquals(expected, element.pushes.get(0).length(), 1e-9);
+    }
+
+    @Test
+    void ripplesFromOppositeSidesCancelButTheElementIsStillAsked() {
+        Pond pond = emptyPond();
+        PlainElement element = new PlainElement(TARGET, 0.1);
+        pond.add(element);
+        pond.addRipple(rippleTowardsTarget(0));
+        pond.addRipple(rippleTowardsTarget(180));
+
+        levelOn(pond).playTurn(NOTHING);
+
+        assertEquals(1, element.pushes.size());
+        assertEquals(0, element.pushes.get(0).length(), DELTA);
+    }
+
+    @Test
+    void aFloatingObjectIsPushedAndPublishesObjectPushed() {
+        Pond pond = emptyPond();
+        LilyPad pad = new LilyPad(TARGET, 0.1);
+        pond.add(pad);
+        pond.addRipple(rippleAt(new Vec2(0.5, 0.3)));
+        Level level = levelOn(pond);
+        RecordingListener listener = new RecordingListener();
+        level.addListener(listener);
+
+        level.playTurn(NOTHING);
+
+        assertEquals(0.5, pad.getPosition().getX(), DELTA);
+        assertEquals(0.4 + Balance.RIPPLE_PUSH_DISTANCE, pad.getPosition().getY(), DELTA);
+        assertEquals(1, listener.received.size());
+        assertEquals(EventType.OBJECT_PUSHED, listener.received.get(0).getType());
+        assertSame(pad, listener.received.get(0).getSubject());
+        assertEquals(Balance.RIPPLE_PUSH_DISTANCE, listener.received.get(0).getAmount(), DELTA);
+    }
+
+    @Test
+    void aRippleWakesATurtleAndMovesIt() {
+        Pond pond = emptyPond();
+        Turtle turtle = new Turtle(TARGET, 0.1);
+        pond.add(turtle);
+        pond.addRipple(rippleAt(new Vec2(0.5, 0.3)));
+        Level level = levelOn(pond);
+        RecordingListener listener = new RecordingListener();
+        level.addListener(listener);
+
+        level.playTurn(NOTHING);
+
+        assertTrue(turtle.isAwake());
+        assertEquals(0.4 + Balance.RIPPLE_PUSH_DISTANCE, turtle.getPosition().getY(), DELTA);
+        assertEquals(EventType.TURTLE_WOKE, listener.received.get(0).getType());
+    }
+
+    @Test
+    void aBlockedObjectStaysAndPublishesNothing() {
+        Pond pond = emptyPond();
+        LilyPad pad = new LilyPad(TARGET, 0.1);
+        pond.add(pad);
+        // A reed just below the pad: the push of 0.08 down would overlap it.
+        pond.add(new Reed(new Vec2(0.5, 0.5), 0.1));
+        pond.addRipple(rippleAt(new Vec2(0.5, 0.3)));
+        Level level = levelOn(pond);
+        RecordingListener listener = new RecordingListener();
+        level.addListener(listener);
+
+        level.playTurn(NOTHING);
+
+        assertEquals(TARGET, pad.getPosition());
+        assertTrue(listener.received.isEmpty());
+    }
+
+    @Test
+    void aFrogOnAPushedObjectRidesAlong() {
+        Frog frog = new Frog(TARGET, Rank.RANK_1);
+        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, frog);
+        LilyPad pad = new LilyPad(TARGET, 0.1);
+        pond.add(pad);
+        Placement.standOn(frog, pad);
+        pond.addRipple(rippleAt(new Vec2(0.5, 0.3)));
+
+        levelOn(pond).playTurn(NOTHING);
+
+        assertEquals(0.4 + Balance.RIPPLE_PUSH_DISTANCE, frog.getPosition().getY(), DELTA);
+        assertSame(pad, frog.standingOn().orElseThrow());
+    }
+
     // TODO(S6) activation: predators. Add once Predator and its hook exist.
 }

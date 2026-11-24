@@ -88,12 +88,14 @@ public class TurnEngine {
 
     /**
      * Step 3: each element, in turn order, collects the push from every ripple whose ring
-     * passes it this turn. The directions are summed first, then the element moves at most
-     * one push distance (GDD 3.1), so two ripples never push an object twice as far.
+     * passes it this turn, then reacts to the combined push (GDD 3.1).
      * <p>
-     * This uses {@link Ripple#passes} and {@link Ripple#pushDirection} directly rather than
-     * {@code Element.reactTo}, because {@code reactTo} applies each push as it comes, which
-     * would break the summing rule.
+     * Each ripple pushes one push distance directly away from its source. The pushes are
+     * added, and the total is capped at one push distance, so two ripples never push an
+     * object twice as far, and ripples from opposite sides partly or fully cancel. The
+     * element then decides what the push does to it, through {@link Element#reactTo}: a
+     * floating object moves, a turtle wakes, and anything else ignores it. Elements that
+     * no ripple passed are not asked.
      *
      * @param level the level being played
      */
@@ -102,57 +104,34 @@ public class TurnEngine {
         List<Ripple> ripples = pond.ripples();
         for (Element element : pond.elementsInOrder()) {
             Vec2 summed = new Vec2(0, 0);
-            boolean pushed = false;
+            boolean passed = false;
             for (Ripple ripple : ripples) {
                 if (ripple.passes(element, pond)) {
-                    summed = summed.plus(ripple.pushDirection(element));
-                    pushed = true;
+                    Vec2 push = ripple.pushDirection(element).scale(Balance.RIPPLE_PUSH_DISTANCE);
+                    summed = summed.plus(push);
+                    passed = true;
                 }
             }
-            if (pushed) {
-                applyPush(level, element, summed);
+            if (passed) {
+                element.reactTo(pushStep(summed), level);
             }
         }
     }
 
     /**
-     * Works out how far an element moves for a summed push: along the direction of the sum,
-     * by at most {@link Balance#RIPPLE_PUSH_DISTANCE}. Opposing pushes that cancel give no move.
+     * Caps a combined push at one push distance ({@link Balance#RIPPLE_PUSH_DISTANCE}),
+     * keeping its direction. A push already shorter, because ripples partly cancel, is
+     * kept as it is; pushes that cancel fully give no move.
      *
-     * @param summed the sum of the unit push directions from every ripple that passed
-     * @return the displacement to apply; the zero vector when nothing should move
+     * @param summed the sum of the pushes of every ripple that passed, in play-area widths
+     * @return the push to apply; the zero vector when nothing should move
      */
     Vec2 pushStep(Vec2 summed) {
         double length = summed.length();
-        if (length == 0.0) {
-            return new Vec2(0, 0);
+        if (length <= Balance.RIPPLE_PUSH_DISTANCE) {
+            return summed;
         }
-        double distance = Math.min(Balance.RIPPLE_PUSH_DISTANCE, length);
-        return summed.normalised().scale(distance);
-    }
-
-    /**
-     * Applies a push to one element. Nothing moves until J8 is merged, so the displacement is
-     * computed and then discarded for now.
-     *
-     * @param level  the level being played
-     * @param element the element receiving the push
-     * @param summed  the sum of the push directions that passed this element
-     */
-    private void applyPush(Level level, Element element, Vec2 summed) {
-        Vec2 step = pushStep(summed);
-        if (step.length() == 0.0) {
-            return;
-        }
-        // TODO(J8): once FloatingObject.push, Turtle wake-up and ICON/OBJECT events exist:
-        //
-        // if (element instanceof FloatingObject floating) {
-        //     double distance = step.length();
-        //     if (floating.push(step.normalised(), distance, level.getPond())) {
-        //         level.publish(new GameEvent(EventType.OBJECT_PUSHED, element, distance));
-        //     }
-        // }
-        // Turtles are woken by J8's own rule (Turtle.onRipple), not here.
+        return summed.normalised().scale(Balance.RIPPLE_PUSH_DISTANCE);
     }
 
     /**
