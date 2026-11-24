@@ -3,16 +3,65 @@ package ripplepond.model.progress;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link Rank}: every column matches the rank table in GDD section 4.3.
+ * Tests for {@link Rank}: every column matches the rank table in GDD section 4.3, and
+ * {@link Rank#forXp} gives the right rank on both sides of every threshold.
  */
 class RankTest {
 
     private static final double DELTA = 1e-12;
+
+    @Test
+    void xpThresholdsMatchTheRankTable() {
+        int[] xp = {0, 50, 120, 200, 290};
+
+        for (Rank rank : Rank.values()) {
+            assertEquals(xp[rank.ordinal()], rank.xpNeeded(), rank.name());
+        }
+    }
+
+    @Test
+    void aNewFrogWithNoXpIsRankOne() {
+        assertEquals(Rank.RANK_1, Rank.forXp(0));
+    }
+
+    @Test
+    void everyRankBoundary() {
+        // One XP short of each threshold is still the rank below; the threshold itself is the new rank.
+        assertEquals(Rank.RANK_1, Rank.forXp(49));
+        assertEquals(Rank.RANK_2, Rank.forXp(50));
+        assertEquals(Rank.RANK_2, Rank.forXp(119));
+        assertEquals(Rank.RANK_3, Rank.forXp(120));
+        assertEquals(Rank.RANK_3, Rank.forXp(199));
+        assertEquals(Rank.RANK_4, Rank.forXp(200));
+        assertEquals(Rank.RANK_4, Rank.forXp(289));
+        assertEquals(Rank.RANK_5, Rank.forXp(290));
+    }
+
+    @Test
+    void xpPastTheLastThresholdStaysAtTheHighestRank() {
+        assertEquals(Rank.RANK_5, Rank.forXp(10_000));
+        assertEquals(Rank.RANK_5, Rank.forXp(Integer.MAX_VALUE));
+    }
+
+    @Test
+    void eachRankNeedsMoreXpThanTheOneBefore() {
+        Rank[] ranks = Rank.values();
+
+        for (int i = 1; i < ranks.length; i++) {
+            assertTrue(ranks[i].xpNeeded() > ranks[i - 1].xpNeeded(), ranks[i].name());
+        }
+    }
+
+    @Test
+    void negativeXpIsRefused() {
+        assertThrows(IllegalArgumentException.class, () -> Rank.forXp(-1));
+    }
 
     @Test
     void hopRangesMatchTheRankTable() {
