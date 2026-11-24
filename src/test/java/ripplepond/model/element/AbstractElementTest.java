@@ -8,9 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import ripplepond.model.geometry.Vec2;
+import ripplepond.model.level.InProgress;
+import ripplepond.model.level.Level;
 import ripplepond.model.level.Pond;
-import ripplepond.model.ripple.Ripple;
-import ripplepond.model.ripple.CircularSpread;
+import ripplepond.model.level.ThrowBag;
+import ripplepond.model.progress.Rank;
 
 /**
  * Tests for {@link AbstractElement}. The numbers are chosen to be exact in binary
@@ -20,9 +22,10 @@ class AbstractElementTest {
 
     private static final double DELTA = 1e-12;
 
-    /** The smallest possible concrete element. It counts how often it felt a ripple. */
+    /** The smallest possible concrete element. It records the pushes it felt. */
     private static final class TestElement extends AbstractElement {
         private int ripplesFelt;
+        private Vec2 lastPush;
 
         TestElement(Vec2 position, double size) {
             super(position, size);
@@ -33,8 +36,9 @@ class AbstractElementTest {
         }
 
         @Override
-        protected void onRipple(Ripple ripple, Pond pond) {
+        protected void onRipple(Vec2 push, Level level) {
             ripplesFelt++;
+            lastPush = push;
         }
 
         void move(Vec2 target) {
@@ -124,32 +128,47 @@ class AbstractElementTest {
         assertThrows(IllegalArgumentException.class, () -> new TestElement(0, 0, Double.NaN));
     }
 
-    @Test
-    void reactToCallsOnRippleWhenTheRingPasses() {
-        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, null);
-        Vec2 source = new Vec2(0.5, 0.5);
-        Ripple ripple = new Ripple(source, new TestElement(source, 0.04), new CircularSpread());
-        TestElement element = new TestElement(0.5, 0.7, 0.04);
-        // The edge is 0.18 from the source; after three turns the ring has reached 0.24.
-        for (int i = 0; i < 3; i++) {
-            ripple.advance(pond);
-        }
+    private static Level level() {
+        Frog frog = new Frog(new Vec2(0.5, 0.5), Rank.RANK_1);
+        return new Level(new Pond(Pond.WIDTH, Pond.HEIGHT, frog), new ThrowBag(), 40, new InProgress());
+    }
 
-        element.reactTo(ripple, pond);
+    @Test
+    void reactToHandsThePushToOnRipple() {
+        TestElement element = new TestElement(0.5, 0.25, 0.125);
+        Vec2 push = new Vec2(0, 0.0625);
+
+        element.reactTo(push, level());
+
+        assertEquals(1, element.ripplesFelt);
+        assertEquals(push, element.lastPush);
+    }
+
+    @Test
+    void aZeroPushStillReachesOnRipple() {
+        // Ripples that cancel out still passed the element, so it is still asked.
+        TestElement element = new TestElement(0.5, 0.25, 0.125);
+
+        element.reactTo(new Vec2(0, 0), level());
 
         assertEquals(1, element.ripplesFelt);
     }
 
     @Test
-    void reactToDoesNothingWhenTheRingDoesNotPass() {
-        Pond pond = new Pond(Pond.WIDTH, Pond.HEIGHT, null);
-        Vec2 source = new Vec2(0.5, 0.5);
-        Ripple ripple = new Ripple(source, new TestElement(source, 0.04), new CircularSpread());
-        TestElement element = new TestElement(0.5, 0.7, 0.04);
-        // No turn has run, so the ring has not moved.
+    void byDefaultAnElementIgnoresRipples() {
+        Reed reed = new Reed(new Vec2(0.5, 0.25), 0.125);
 
-        element.reactTo(ripple, pond);
+        reed.reactTo(new Vec2(0.0625, 0), level());
 
+        assertEquals(new Vec2(0.5, 0.25), reed.getPosition());
+    }
+
+    @Test
+    void reactToRejectsNulls() {
+        TestElement element = new TestElement(0.5, 0.25, 0.125);
+
+        assertThrows(NullPointerException.class, () -> element.reactTo(null, level()));
+        assertThrows(NullPointerException.class, () -> element.reactTo(new Vec2(0, 0), null));
         assertEquals(0, element.ripplesFelt);
     }
 }

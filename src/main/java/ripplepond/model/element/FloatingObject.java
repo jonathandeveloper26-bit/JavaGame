@@ -3,23 +3,26 @@ package ripplepond.model.element;
 import java.util.Objects;
 import java.util.Optional;
 
+import ripplepond.model.event.EventType;
+import ripplepond.model.event.GameEvent;
 import ripplepond.model.geometry.Vec2;
+import ripplepond.model.level.Level;
 import ripplepond.model.level.Pond;
 
 /**
  * Something that floats on the water and that the frog can stand on: a thrown object or
  * a lily pad (GDD section 2.2).
  * <p>
- * A floating object can carry one frog, its rider. When the object is pushed, the rider
- * moves with it by the same amount. This is the riding rule (GDD section 3, step 3).
+ * When ripples reach it, it is pushed away from their sources (GDD 3.1) and publishes
+ * {@code OBJECT_PUSHED}. A floating object can carry one frog, its rider. When the
+ * object is pushed, the rider moves with it by the same amount. This is the riding rule
+ * (GDD section 3, step 3).
  * <p>
  * The link between the frog and the object it stands on is kept on both sides:
  * {@link Frog#standingOn()} and {@link #getRider()} always agree. Only
  * {@code Frog.standOn} changes it, so the two sides cannot drift apart.
  * <p>
- * Still to come: blocking by reed clumps, other objects and banks (J8), and being pushed
- * away from a ripple's source in {@code onRipple} (J8, once ripples have a source in
- * S4).
+ * Still to come: blocking by reed clumps, other objects and banks (J8, next step).
  */
 public abstract class FloatingObject extends AbstractElement {
 
@@ -88,6 +91,22 @@ public abstract class FloatingObject extends AbstractElement {
             rider.moveTo(rider.getPosition().plus(offset));
         }
         return true;
+    }
+
+    /**
+     * Moves the object by the ripples' combined push and, if it moved, publishes
+     * {@code OBJECT_PUSHED} with the distance moved as its amount. A zero push, from
+     * ripples that cancel out, moves nothing and publishes nothing.
+     *
+     * @param push  the combined push
+     * @param level the level being played
+     */
+    @Override
+    protected void onRipple(Vec2 push, Level level) {
+        double distance = push.length();
+        if (push(push, distance, level.getPond())) {
+            level.publish(new GameEvent(EventType.OBJECT_PUSHED, this, distance));
+        }
     }
 
     /**
