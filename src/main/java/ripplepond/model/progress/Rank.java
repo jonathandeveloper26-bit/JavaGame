@@ -3,43 +3,57 @@ package ripplepond.model.progress;
 /**
  * The frog's rank, which grows with experience (GDD section 4.3).
  * <p>
- * Each rank is one row of the rank table, held here as data. A higher rank raises the
- * frog's maximum health and maximum energy. The ranks are declared from lowest to
- * highest, so their order is the order the frog reaches them.
+ * Each rank is one row of the rank table, held here as data. A higher rank lets the frog
+ * hop further and raises its maximum health and maximum energy, and from the third rank
+ * the frog can swim. The ranks are declared from lowest to highest, so their order is
+ * the order the frog reaches them.
  * <p>
- * This first version only holds the maximums, which {@code Frog} needs. The other
- * columns of the table (XP needed, hop range, swimming) and {@code forXp} are added
- * in J7.
+ * The XP column of the table and {@code forXp} are added in J7.
  */
 public enum Rank {
 
     /** The rank every frog starts at. */
-    RANK_1(10, 20),
+    RANK_1(0.10, 10, 20, false),
 
     /** Second rank. */
-    RANK_2(12, 24),
+    RANK_2(0.12, 12, 24, false),
 
-    /** Third rank. */
-    RANK_3(14, 28),
+    /** Third rank: the first that can swim. */
+    RANK_3(0.14, 14, 28, true),
 
     /** Fourth rank. */
-    RANK_4(16, 32),
+    RANK_4(0.16, 16, 32, true),
 
     /** Fifth and highest rank. */
-    RANK_5(18, 36);
+    RANK_5(0.18, 18, 36, true);
 
+    private final double hopRange;
     private final int maxHealth;
     private final int maxEnergy;
+    private final boolean canSwim;
 
     /**
-     * Creates a rank from one row of the rank table.
+     * Creates a rank from one row of the rank table. Every number is [proposed].
      *
-     * @param maxHealth the most health a frog of this rank can have [proposed]
-     * @param maxEnergy the most energy a frog of this rank can have [proposed]
+     * @param hopRange  the furthest a frog of this rank can hop, in play-area widths
+     * @param maxHealth the most health a frog of this rank can have
+     * @param maxEnergy the most energy a frog of this rank can have
+     * @param canSwim   whether a frog of this rank can swim
      */
-    Rank(int maxHealth, int maxEnergy) {
+    Rank(double hopRange, int maxHealth, int maxEnergy, boolean canSwim) {
+        this.hopRange = hopRange;
         this.maxHealth = maxHealth;
         this.maxEnergy = maxEnergy;
+        this.canSwim = canSwim;
+    }
+
+    /**
+     * Returns the furthest a frog of this rank can hop in one move.
+     *
+     * @return the hop range, in play-area widths
+     */
+    public double hopRange() {
+        return hopRange;
     }
 
     /**
@@ -60,5 +74,14 @@ public enum Rank {
      */
     public int maxEnergy() {
         return maxEnergy;
+    }
+
+    /**
+     * Returns {@code true} if a frog of this rank can swim.
+     *
+     * @return whether swimming is unlocked
+     */
+    public boolean canSwim() {
+        return canSwim;
     }
 }

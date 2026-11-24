@@ -2,14 +2,44 @@ package ripplepond.model.progress;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link Rank}: the maximums match the rank table in GDD section 4.3.
+ * Tests for {@link Rank}: every column matches the rank table in GDD section 4.3.
  */
 class RankTest {
+
+    private static final double DELTA = 1e-12;
+
+    @Test
+    void hopRangesMatchTheRankTable() {
+        double[] hop = {0.10, 0.12, 0.14, 0.16, 0.18};
+
+        for (Rank rank : Rank.values()) {
+            assertEquals(hop[rank.ordinal()], rank.hopRange(), DELTA, rank.name());
+        }
+    }
+
+    @Test
+    void eachRankHopsFurtherThanTheOneBefore() {
+        Rank[] ranks = Rank.values();
+
+        for (int i = 1; i < ranks.length; i++) {
+            assertTrue(ranks[i].hopRange() > ranks[i - 1].hopRange(), ranks[i].name());
+        }
+    }
+
+    @Test
+    void swimmingStartsAtTheThirdRank() {
+        assertFalse(Rank.RANK_1.canSwim());
+        assertFalse(Rank.RANK_2.canSwim());
+        assertTrue(Rank.RANK_3.canSwim());
+        assertTrue(Rank.RANK_4.canSwim());
+        assertTrue(Rank.RANK_5.canSwim());
+    }
 
     @Test
     void thereAreFiveRanksFromLowestToHighest() {

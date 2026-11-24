@@ -2,6 +2,7 @@ package ripplepond.model.level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import ripplepond.model.element.Element;
 import ripplepond.model.element.Frog;
+import ripplepond.model.element.LilyPad;
 import ripplepond.model.element.Reed;
 import ripplepond.model.geometry.Vec2;
 import ripplepond.model.progress.Rank;
@@ -164,5 +166,34 @@ class PondTest {
     void zeroDepthStartBankLeavesTheBottomEdgeInTheWater() {
         Pond pond = new Pond(1, HEIGHT, BANK, 0, frog());
         assertEquals(AreaType.WATER, pond.areaAt(new Vec2(0.5, HEIGHT)));
+    }
+
+    @Test
+    void surfaceAtFindsTheObjectUnderAPoint() {
+        Pond pond = pond();
+        LilyPad pad = new LilyPad(new Vec2(0.5, 0.25), 0.125);
+        pond.add(pad);
+
+        assertSame(pad, pond.surfaceAt(new Vec2(0.53125, 0.25)).orElseThrow());
+        assertTrue(pond.surfaceAt(new Vec2(0.75, 0.25)).isEmpty());
+    }
+
+    @Test
+    void surfaceAtIgnoresElementsThatDoNotFloat() {
+        Pond pond = pond();
+        pond.add(reedAt(0.5, 0.25));
+
+        assertTrue(pond.surfaceAt(new Vec2(0.5, 0.25)).isEmpty());
+    }
+
+    @Test
+    void surfaceAtPicksTheNearestOfTwoOverlappingObjects() {
+        Pond pond = pond();
+        LilyPad left = new LilyPad(new Vec2(0.5, 0.25), 0.25);
+        LilyPad right = new LilyPad(new Vec2(0.625, 0.25), 0.25);
+        pond.add(left);
+        pond.add(right);
+
+        assertSame(right, pond.surfaceAt(new Vec2(0.59375, 0.25)).orElseThrow());
     }
 }
