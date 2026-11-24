@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import ripplepond.model.Balance;
 import ripplepond.model.geometry.Vec2;
+import ripplepond.model.level.Pond;
+import ripplepond.model.movement.MoveMode;
 import ripplepond.model.progress.Rank;
 
 /**
@@ -15,10 +17,20 @@ import ripplepond.model.progress.Rank;
  * and that maximum. Health is a whole number of HP. Energy is a decimal number, because
  * moves cost energy by distance (GDD section 4.2).
  * <p>
+ * The frog moves with {@link #move}, using a {@link MoveMode}: walk, hop or swim. The
+ * mode knows the rules; the frog pays the energy and keeps track of what it stands on.
+ * <p>
  * A new frog is created for each level, so health and energy are full at the start of
- * every level. Moving the frog comes in J6.
+ * every level.
  */
 public final class Frog extends AbstractElement {
+
+    /**
+     * How much energy may be missing and the move still count as paid for. Costs are
+     * computed with decimals, so a move meant to cost exactly the energy left can come
+     * out a hair above it. It is not a game rule.
+     */
+    private static final double ROUNDING = 1e-9;
 
     private final Rank rank;
     private int health;
@@ -140,6 +152,54 @@ public final class Frog extends AbstractElement {
      */
     public Optional<FloatingObject> standingOn() {
         return Optional.ofNullable(standingOn);
+    }
+
+    /**
+     * Returns {@code true} if the frog has enough energy for a move. Exactly enough
+     * counts, so the frog can use its last energy to reach the far bank.
+     *
+     * @param mode   how the frog would move
+     * @param target where the frog would end up
+     * @return whether the frog can pay for the move
+     * @throws NullPointerException if {@code mode} or {@code target} is {@code null}
+     */
+    public boolean canAfford(MoveMode mode, Vec2 target) {
+        Objects.requireNonNull(mode, "mode");
+        Objects.requireNonNull(target, "target");
+        return energy >= costOf(mode, target) - ROUNDING;
+    }
+
+    /**
+     * Moves the frog, if the move is legal and the frog can pay for it (GDD 4.2).
+     * <p>
+     * A refused move changes nothing. Otherwise the frog pays the energy, moves to the
+     * target, and from then on stands on the floating object under the target, or on
+     * nothing when the target is a bank or open water. A move paid with exactly the
+     * energy left leaves the frog with none.
+     *
+     * @param mode   how the frog moves: walk, hop or swim
+     * @param target where the frog ends up, in play-area widths
+     * @param pond   the pond the frog is in
+     * @return {@code true} if the frog moved; {@code false} if the move was refused
+     * @throws NullPointerException if any argument is {@code null}
+     */
+    public boolean move(MoveMode mode, Vec2 target, Pond pond) {
+        Objects.requireNonNull(mode, "mode");
+        Objects.requireNonNull(target, "target");
+        Objects.requireNonNull(pond, "pond");
+        if (!mode.isLegal(this, target, pond) || !canAfford(mode, target)) {
+            return false;
+        }
+        double cost = costOf(mode, target);
+        // Paying "exactly" the energy left must leave 0, not a rounding crumb.
+        spendEnergy(energy - cost < ROUNDING ? energy : cost);
+        moveTo(target);
+        standOn(pond.surfaceAt(target).orElse(null));
+        return true;
+    }
+
+    private double costOf(MoveMode mode, Vec2 target) {
+        return mode.costFor(getPosition().distanceTo(target));
     }
 
     /**
