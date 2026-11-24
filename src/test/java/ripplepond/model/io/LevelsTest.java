@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import ripplepond.model.element.Element;
@@ -12,6 +14,10 @@ import ripplepond.model.element.Frog;
 import ripplepond.model.element.LilyPad;
 import ripplepond.model.element.ThrowableKind;
 import ripplepond.model.element.Turtle;
+import ripplepond.model.element.pickup.Breadcrumb;
+import ripplepond.model.element.pickup.Fly;
+import ripplepond.model.element.pickup.Food;
+import ripplepond.model.element.pickup.Minnow;
 import ripplepond.model.element.pickup.ThrowableIcon;
 import ripplepond.model.geometry.Vec2;
 import ripplepond.model.level.InProgress;
@@ -20,6 +26,7 @@ import ripplepond.model.level.TurnAction;
 import ripplepond.model.level.Won;
 import ripplepond.model.movement.Hop;
 import ripplepond.model.movement.MoveMode;
+import ripplepond.model.movement.Swim;
 import ripplepond.model.movement.Walk;
 import ripplepond.model.progress.Rank;
 
@@ -112,7 +119,7 @@ class LevelsTest {
     }
 
     @Test
-    void levelTwoLoadsWithPadsATurtleAndAnIcon() throws LevelFormatException {
+    void levelTwoLoadsWithPadsATurtleAnIconAndAFly() throws LevelFormatException {
         Level level = loader.load("levels/level2.txt", Rank.RANK_1);
 
         assertEquals(20, level.getTurnLimit());
@@ -120,6 +127,7 @@ class LevelsTest {
         assertEquals(2, level.getPond().elementsInOrder().stream().filter(LilyPad.class::isInstance).count());
         assertEquals(1, level.getPond().elementsInOrder().stream().filter(Turtle.class::isInstance).count());
         assertEquals(1, level.getPond().elementsInOrder().stream().filter(ThrowableIcon.class::isInstance).count());
+        assertEquals(1, level.getPond().elementsInOrder().stream().filter(Fly.class::isInstance).count());
     }
 
     @Test
@@ -165,6 +173,75 @@ class LevelsTest {
         assertEquals(6, level.getTurn());
         Frog frog = level.getPond().getFrog();
         assertTrue(frog.getEnergy() > 10, "energy left: " + frog.getEnergy());
+        assertEquals(1, level.getBag().count(ThrowableKind.TWIG));
+    }
+
+    // Level 5, played with a rank 3 frog (hop 0.14, can swim)
+
+    private static final Vec2 L5_EDGE = new Vec2(0.50, 0.595);
+    private static final Vec2 L5_PAD_1 = new Vec2(0.50, 0.46);
+    private static final Vec2 L5_PAD_2 = new Vec2(0.46, 0.27);
+
+    private static LilyPad padTwo(Level level) {
+        return level.getPond().elementsInOrder().stream()
+                .filter(LilyPad.class::isInstance).map(LilyPad.class::cast)
+                .filter(pad -> pad.getPosition().getY() < 0.40).findFirst().orElseThrow();
+    }
+
+    @Test
+    void levelFiveLoadsWithOneFoodOfEachKind() throws LevelFormatException {
+        Level level = loader.load("levels/level5.txt", Rank.RANK_3);
+
+        assertEquals(15, level.getTurnLimit());
+        assertEquals(2, level.getBag().count(ThrowableKind.TWIG));
+        for (Class<?> food : List.of(Fly.class, Minnow.class, Breadcrumb.class)) {
+            assertEquals(1, level.getPond().elementsInOrder().stream().filter(food::isInstance).count(),
+                    food.getSimpleName());
+        }
+    }
+
+    @Test
+    void levelFiveTheReedShadowsPadTwoFromStraightAbove() throws LevelFormatException {
+        Level level = loader.load("levels/level5.txt", Rank.RANK_3);
+        LilyPad padTwo = padTwo(level);
+
+        // The obvious throw, straight above pad 2: the reed blocks its ripple.
+        level.playTurn(new TurnAction(ThrowableKind.TWIG, new Vec2(0.46, 0.14), null, null));
+        level.playTurn(move(new Walk(), L5_EDGE));
+        level.playTurn(move(new Hop(), L5_PAD_1));
+
+        assertEquals(L5_PAD_2, padTwo.getPosition());
+        level.playTurn(move(new Hop(), L5_PAD_2));
+        assertEquals(L5_PAD_1, level.getPond().getFrog().getPosition());
+    }
+
+    @Test
+    void levelFiveCanBeWonWithItsStartingBag() throws LevelFormatException {
+        Level level = loader.load("levels/level5.txt", Rank.RANK_3);
+        Frog frog = level.getPond().getFrog();
+        LilyPad padTwo = padTwo(level);
+        Hop hop = new Hop();
+        Swim swim = new Swim();
+
+        // Throw from the side of the reed's shadow, and walk to the edge, eating the
+        // breadcrumb there.
+        play(level, throwAndMove(ThrowableKind.TWIG, new Vec2(0.419, 0.126), new Walk(), L5_EDGE), L5_EDGE);
+        // One long hop to pad 1, eating the minnow. The ripple reaches pad 2 and pushes it.
+        play(level, move(hop, L5_PAD_1), L5_PAD_1);
+        Vec2 pushed = padTwo.getPosition();
+        assertTrue(pushed.getY() > L5_PAD_2.getY(), "pad 2 should have been pushed towards pad 1: " + pushed);
+        assertTrue(pushed.distanceTo(L5_PAD_1) <= Rank.RANK_3.hopRange(), "pad 2 out of reach: " + pushed);
+        // Hop to pad 2 where it now is, then swim the rest, eating the fly on the way.
+        play(level, move(hop, pushed), pushed);
+        play(level, move(swim, new Vec2(0.52, 0.26)), new Vec2(0.52, 0.26));
+        play(level, move(swim, new Vec2(0.52, 0.165)), new Vec2(0.52, 0.165));
+        play(level, move(swim, new Vec2(0.52, 0.075)), new Vec2(0.52, 0.075));
+
+        assertInstanceOf(Won.class, level.getState());
+        assertEquals(6, level.getTurn());
+        assertEquals(0, level.getPond().elementsInOrder().stream().filter(Food.class::isInstance).count(),
+                "all three foods eaten on the way");
+        assertTrue(frog.hasEnergy());
         assertEquals(1, level.getBag().count(ThrowableKind.TWIG));
     }
 }
