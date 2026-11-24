@@ -22,7 +22,7 @@ import ripplepond.model.level.Pond;
  * {@link Frog#standingOn()} and {@link #getRider()} always agree. Only
  * {@code Frog.standOn} changes it, so the two sides cannot drift apart.
  * <p>
- * Still to come: blocking by reed clumps, other objects and banks (J8, next step).
+ * A push is blocked by reed clumps, turtles, other floating objects and the banks.
  */
 public abstract class FloatingObject extends AbstractElement {
 
@@ -63,22 +63,39 @@ public abstract class FloatingObject extends AbstractElement {
     }
 
     /**
+     * Returns {@code true}: a floating object takes up its space, so other floating
+     * objects and turtles cannot be pushed into it.
+     *
+     * @return {@code true}
+     */
+    @Override
+    public boolean isSolid() {
+        return true;
+    }
+
+    /**
      * Pushes this object, and its rider with it.
      * <p>
      * The object moves {@code distance} along {@code direction}. Only the direction of
      * {@code direction} counts, not its length. If there is a rider, it moves by exactly
      * the same amount, so it stays at the same spot on the object.
+     * <p>
+     * The push is blocked, and nothing moves, if the object would end up overlapping a
+     * reed clump, a turtle or another floating object, reaching onto a bank, or leaving
+     * the play area (GDD 3.1). Ending up just touching something is allowed.
      *
      * @param direction the direction to push in; its length does not matter
      * @param distance  how far to push, in play-area widths; 0 or more
-     * @param pond      the pond the object is in; used for blocking from J8
-     * @return {@code true} if the object moved; {@code false} for a distance of 0 or a
-     *         direction of zero length
-     * @throws NullPointerException     if {@code direction} is {@code null}
+     * @param pond      the pond the object is in
+     * @return {@code true} if the object moved; {@code false} for a distance of 0, a
+     *         direction of zero length, or a blocked push
+     * @throws NullPointerException     if {@code direction} or {@code pond} is
+     *                                  {@code null}
      * @throws IllegalArgumentException if {@code distance} is negative or not a number
      */
     public boolean push(Vec2 direction, double distance, Pond pond) {
         Objects.requireNonNull(direction, "direction");
+        Objects.requireNonNull(pond, "pond");
         if (!(distance >= 0)) {
             throw new IllegalArgumentException("distance must be 0 or more: " + distance);
         }
@@ -86,7 +103,11 @@ public abstract class FloatingObject extends AbstractElement {
             return false;
         }
         Vec2 offset = direction.normalised().scale(distance);
-        moveTo(getPosition().plus(offset));
+        Vec2 target = getPosition().plus(offset);
+        if (!pond.isClearFor(this, target)) {
+            return false;
+        }
+        moveTo(target);
         if (rider != null) {
             rider.moveTo(rider.getPosition().plus(offset));
         }

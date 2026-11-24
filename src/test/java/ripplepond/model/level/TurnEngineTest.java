@@ -17,6 +17,7 @@ import ripplepond.model.element.Element;
 import ripplepond.model.element.Frog;
 import ripplepond.model.element.LilyPad;
 import ripplepond.model.element.Placement;
+import ripplepond.model.element.Reed;
 import ripplepond.model.element.pickup.Pickup;
 import ripplepond.model.event.EventType;
 import ripplepond.model.event.GameEvent;
@@ -459,6 +460,24 @@ class TurnEngineTest {
         assertEquals(EventType.OBJECT_PUSHED, listener.received.get(0).getType());
         assertSame(pad, listener.received.get(0).getSubject());
         assertEquals(Balance.RIPPLE_PUSH_DISTANCE, listener.received.get(0).getAmount(), DELTA);
+    }
+
+    @Test
+    void aBlockedObjectStaysAndPublishesNothing() {
+        Pond pond = emptyPond();
+        LilyPad pad = new LilyPad(TARGET, 0.1);
+        pond.add(pad);
+        // A reed just below the pad: the push of 0.08 down would overlap it.
+        pond.add(new Reed(new Vec2(0.5, 0.5), 0.1));
+        pond.addRipple(rippleAt(new Vec2(0.5, 0.3)));
+        Level level = levelOn(pond);
+        RecordingListener listener = new RecordingListener();
+        level.addListener(listener);
+
+        level.playTurn(NOTHING);
+
+        assertEquals(TARGET, pad.getPosition());
+        assertTrue(listener.received.isEmpty());
     }
 
     @Test

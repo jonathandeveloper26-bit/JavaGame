@@ -34,4 +34,14 @@ public final class Turtle extends AbstractElement {
     public boolean isAwake() {
         return awake;
     }
+
+    /**
+     * Returns {@code true}: a turtle blocks the space it occupies (GDD 2.2).
+     *
+     * @return {@code true}
+     */
+    @Override
+    public boolean isSolid() {
+        return true;
+    }
 }

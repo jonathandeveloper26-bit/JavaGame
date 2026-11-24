@@ -24,6 +24,18 @@ public interface Element {
     double distanceTo(Element other);
 
     /**
+     * Returns {@code true} if this element takes up its space, so that a floating object
+     * or a turtle cannot be pushed into it (GDD 2.2, 3.1). Reed clumps, turtles and
+     * floating objects are solid; by default an element is not, so pickups such as food
+     * and throwable icons never block anything.
+     *
+     * @return whether this element blocks things that are pushed
+     */
+    default boolean isSolid() {
+        return false;
+    }
+
+    /**
      * Responds to the ripples that reached this element this turn. The turn engine calls
      * it once per turn for each element that at least one ripple's ring passed, with the
      * combined push of all those ripples (GDD 3.1).
