@@ -137,6 +137,11 @@ public final class Vec2 {
         return plus(offset.normalised().scale(maxStep));
     }
 
+    /** The dot product: large when two vectors point the same way, zero when they are at right angles. */
+    public double dot(Vec2 other) {
+        return x * other.x + y * other.y;
+    }
+
     /**
      * Checks whether this vector is equal to another object.
      * <p>
