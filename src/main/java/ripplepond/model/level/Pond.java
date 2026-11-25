@@ -327,4 +327,13 @@ public class Pond {
      public void removeFadedRipples() {
          ripples.removeIf(Ripple::isFaded);
      }
+    /** Returns the depth of the far bank at the top of the play area. */
+    public double getFarBankDepth() {
+        return farBankDepth;
+    }
+
+    /** Returns the depth of the start bank at the bottom of the play area. */
+    public double getStartBankDepth() {
+        return startBankDepth;
+    }
 }

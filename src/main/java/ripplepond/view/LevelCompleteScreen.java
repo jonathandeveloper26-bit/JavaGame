@@ -11,7 +11,10 @@ final class LevelCompleteScreen {
 
     static Parent create(FxApp app) {
         Button next = new Button("Next level");
-        next.setOnAction(event -> app.showLevel());
-        return Placeholders.column("Level complete (placeholder)", next);
+        next.setOnAction(event -> app.playNextLevel());
+        next.setDisable(!app.hasNextLevel());
+        Button title = new Button("Back to title");
+        title.setOnAction(event -> app.showTitle());
+        return Placeholders.column("Level complete (placeholder)", next, title);
     }
 }

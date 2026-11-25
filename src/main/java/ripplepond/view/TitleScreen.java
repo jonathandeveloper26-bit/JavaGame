@@ -11,7 +11,7 @@ final class TitleScreen {
 
     static Parent create(FxApp app) {
         return Placeholders.column("Ripple Pond",
-                button("Play", app::showLevel),
+                button("Play", app::startGame),
                 button("How to Play", () -> { /* X2 and X3 */ }),
                 button("Quit", app::quit));
     }
