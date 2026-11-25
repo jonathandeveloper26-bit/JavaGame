@@ -11,7 +11,7 @@ final class GameOverScreen {
 
     static Parent create(FxApp app) {
         Button retry = new Button("Retry");
-        retry.setOnAction(event -> app.showLevel());
+        retry.setOnAction(event -> app.retryLevel());
         Button title = new Button("Back to title");
         title.setOnAction(event -> app.showTitle());
         return Placeholders.column("Game over (placeholder)", retry, title);
