@@ -104,9 +104,9 @@ public class FxApp extends Application {
         setScreen(LevelCompleteScreen.create(this, LevelSummary.of(controller)));
     }
 
-    /** Shows the game over screen. */
+    /** Shows the game over screen, with why the level was lost. */
     public void showGameOver() {
-        setScreen(GameOverScreen.create(this));
+        setScreen(GameOverScreen.create(this, LossSummary.of(controller)));
     }
 
     /** Sets a screen that is not the level, and stops the river animation. */
