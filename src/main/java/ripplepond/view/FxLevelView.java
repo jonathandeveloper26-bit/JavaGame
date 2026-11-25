@@ -5,12 +5,14 @@ import java.util.Deque;
 import java.util.EnumMap;
 import java.util.Map;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import ripplepond.controller.GameController;
@@ -37,13 +39,18 @@ import ripplepond.model.ripple.Ripple;
  * The view only reads the model and draws it. Every player choice goes through
  * {@link FxInputHandler}, which in turn calls the {@link GameController}. The view listens
  * for events to write the message log.
+ * <p>
+ * The canvas fills whatever space the window gives it. {@link PixelMapping} fits the 3:2
+ * play area inside that space, centred, and the margins around it are drawn neutral.
  */
 final class FxLevelView implements PondListener {
 
+    /** Starting canvas size. The canvas then follows the window. */
     static final double CANVAS_WIDTH = 720;
     static final double CANVAS_HEIGHT = 480;
     private static final int LOG_LINES = 3;
 
+    private static final Color MARGIN = Color.web("#f4f4f4");
     private static final Color WATER = Color.web("#1d4f6b");
     private static final Color BANK = Color.web("#8c6d46");
     private static final Color FROG = Color.web("#7ed957");
@@ -55,24 +62,36 @@ final class FxLevelView implements PondListener {
     private static final Color PICKUP = Color.web("#f4d35e");
     private static final Color RIPPLE = Color.web("#dff6ff", 0.6);
     private static final Color PREVIEW = Color.web("#ffffff", 0.9);
+    private static final Color WAVE = Color.web("#ffffff", 0.08);
 
     private final GameController controller;
     private final Runnable onLevelOver;
     private final FxInputHandler input;
     private final Deque<String> messages = new ArrayDeque<>();
+    private double wavePhase;
 
     private final BorderPane root = new BorderPane();
     private final Canvas canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+    private final StackPane canvasHolder = new StackPane(canvas);
     private final Label status = new Label();
     private final Label log = new Label();
     private final Label bagTitle = new Label("Throw bag");
     private final Label moveTitle = new Label("Move");
     private final Map<ThrowableKind, Button> bagButtons = new EnumMap<>(ThrowableKind.class);
 
+    /** Advances the wave phase each frame and redraws. Stopped when the level screen is hidden. */
+    private final AnimationTimer waveTimer = new AnimationTimer() {
+        @Override
+        public void handle(long now) {
+            wavePhase += 0.05;
+            redraw();
+        }
+    };
+
     /**
      * Builds the level screen.
      *
-     * @param controller the game being played
+     * @param controller  the game being played
      * @param onLevelOver runs after a turn that wins or loses the level
      */
     FxLevelView(GameController controller, Runnable onLevelOver) {
@@ -86,6 +105,13 @@ final class FxLevelView implements PondListener {
                 input.clickPlayArea(map.toFraction(event.getX(), event.getY()));
             }
         });
+
+        // The canvas takes the size of its holder, so it grows and shrinks with the window.
+        canvasHolder.setMinSize(0, 0);
+        canvas.widthProperty().bind(canvasHolder.widthProperty());
+        canvas.heightProperty().bind(canvasHolder.heightProperty());
+        canvas.widthProperty().addListener((obs, oldV, newV) -> redraw());
+        canvas.heightProperty().addListener((obs, oldV, newV) -> redraw());
 
         VBox panel = new VBox(10, bagTitle);
         for (ThrowableKind kind : ThrowableKind.values()) {
@@ -107,9 +133,12 @@ final class FxLevelView implements PondListener {
         panel.setPrefWidth(180);
 
         status.setStyle("-fx-font-size: 14px;");
+        status.setWrapText(true);
+        status.setMaxWidth(Double.MAX_VALUE);
         log.setStyle("-fx-font-size: 13px;");
+
         root.setTop(status);
-        root.setCenter(canvas);
+        root.setCenter(canvasHolder);
         root.setRight(panel);
         root.setBottom(log);
     }
@@ -127,15 +156,38 @@ final class FxLevelView implements PondListener {
 
     /** Redraws the level and refreshes the labels and buttons from the model. */
     void refresh() {
+        redraw();
+        updateLabels(controller.getLevel());
+    }
+
+    /** Starts the river animation. Called when the level screen is shown. */
+    void startWaves() {
+        waveTimer.start();
+    }
+
+    /** Stops the river animation. Called when any other screen is shown. */
+    void stopWaves() {
+        waveTimer.stop();
+    }
+
+    /** Draws the level at the canvas's current size. The play area is centred; margins are neutral. */
+    private void redraw() {
         Level level = controller.getLevel();
-        if (level == null) {
+        if (level == null || canvas.getWidth() <= 0 || canvas.getHeight() <= 0) {
             return;
         }
         Pond pond = level.getPond();
         PixelMapping map = mapping();
         GraphicsContext g = canvas.getGraphicsContext2D();
+
+        g.setFill(MARGIN);
+        g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        PixelMapping.Point origin = map.toPixels(new Vec2(0, 0));
         g.setFill(WATER);
-        g.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        g.fillRect(origin.x(), origin.y(), Pond.WIDTH * map.scale(), Pond.HEIGHT * map.scale());
+
+        drawWaves(g, map);
         drawBanks(g, map, pond);
         drawRipples(g, map, pond);
         for (Element element : pond.elementsInOrder()) {
@@ -144,7 +196,27 @@ final class FxLevelView implements PondListener {
         Frog frog = pond.getFrog();
         disc(g, map, frog.getPosition(), frog.getSize(), FROG);
         drawPreview(g, map, frog);
-        updateLabels(level, frog);
+    }
+
+    /** Draws faint wave lines inside the play area only. The banks are drawn over them. */
+    private void drawWaves(GraphicsContext g, PixelMapping map) {
+        PixelMapping.Point origin = map.toPixels(new Vec2(0, 0));
+        double playWidth = Pond.WIDTH * map.scale();
+        double playHeight = Pond.HEIGHT * map.scale();
+        g.setStroke(WAVE);
+        g.setLineWidth(2);
+        for (double y = 12; y < playHeight; y += 24) {
+            g.beginPath();
+            for (double x = 0; x <= playWidth; x += 6) {
+                double dy = Math.sin(x / 40.0 + wavePhase + y / 30.0) * 3;
+                if (x == 0) {
+                    g.moveTo(origin.x() + x, origin.y() + y + dy);
+                } else {
+                    g.lineTo(origin.x() + x, origin.y() + y + dy);
+                }
+            }
+            g.stroke();
+        }
     }
 
     /** Called after a turn: redraws, then tells the screen owner if the level is over. */
@@ -192,7 +264,8 @@ final class FxLevelView implements PondListener {
         };
     }
 
-    private void updateLabels(Level level, Frog frog) {
+    private void updateLabels(Level level) {
+        Frog frog = level.getPond().getFrog();
         int xp = controller.getSession().getProgress().getXp();
         status.setText(String.format(
                 "Health %d/%d    Energy %.0f/%d    Rank %d    XP %d    Turn %d of %d",
@@ -274,6 +347,6 @@ final class FxLevelView implements PondListener {
     }
 
     private PixelMapping mapping() {
-        return new PixelMapping(CANVAS_WIDTH, CANVAS_HEIGHT);
+        return new PixelMapping(canvas.getWidth(), canvas.getHeight());
     }
 }

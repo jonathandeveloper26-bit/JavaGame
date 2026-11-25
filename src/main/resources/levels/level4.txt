@@ -1,0 +1,19 @@
+# Level 4 - The swim
+# Owner: Stephan (S9). Needs a rank 3 frog: swimming is locked below rank 3.
+#
+# The frog hops onto one pad, then swims the open water to the far bank. A reed clump
+# stands off the swim lane, so it does not block the route.
+#
+# Route (checked by LevelsTest, levelFourCanBeWonAtRankThree, starting at rank 3): hop to the pad at 0.47, swim to
+# 0.37, 0.27 and 0.17, then swim onto the far bank at 0.11.
+
+turns 20
+bank far 0.12
+bank start 0.12
+frog 0.50 0.60
+
+lilypad 0.50 0.47 0.08
+lilypad 0.50 0.30 0.08
+reed    0.40 0.22 0.06
+
+bag twig 2

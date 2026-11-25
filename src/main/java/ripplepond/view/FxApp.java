@@ -2,6 +2,7 @@ package ripplepond.view;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
@@ -29,7 +30,7 @@ public class FxApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        controller = new GameController(createSession());
+        controller = new GameController(new GameSession());
         levelView = new FxLevelView(controller, this::levelFinished);
         controller.addListener(levelView);
 
@@ -46,13 +47,9 @@ public class FxApp extends Application {
         showTitle();
     }
 
-    private static GameSession createSession() {
-        return new GameSession();
-    }
-
     /** Shows the title screen. */
     public void showTitle() {
-        scene.setRoot(TitleScreen.create(this));
+        setScreen(TitleScreen.create(this));
     }
 
     /** Loads the first level and starts playing it (the Play button). */
@@ -65,10 +62,11 @@ public class FxApp extends Application {
         showLevel();
     }
 
-    /** Shows the level screen for the level already loaded. */
+    /** Shows the level screen for the level already loaded, and starts the river animation. */
     public void showLevel() {
         levelView.refresh();
         scene.setRoot(levelView.root());
+        levelView.startWaves();
     }
 
     /** Restarts the current level from its file (the Retry button). */
@@ -98,12 +96,18 @@ public class FxApp extends Application {
 
     /** Shows the level complete screen. */
     public void showLevelComplete() {
-        scene.setRoot(LevelCompleteScreen.create(this));
+        setScreen(LevelCompleteScreen.create(this));
     }
 
     /** Shows the game over screen. */
     public void showGameOver() {
-        scene.setRoot(GameOverScreen.create(this));
+        setScreen(GameOverScreen.create(this));
+    }
+
+    /** Sets a screen that is not the level, and stops the river animation. */
+    private void setScreen(Parent screen) {
+        levelView.stopWaves();
+        scene.setRoot(screen);
     }
 
     /** Closes the game. Used by Quit and Esc. */
