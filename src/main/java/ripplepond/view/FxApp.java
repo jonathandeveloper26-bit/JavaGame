@@ -52,6 +52,11 @@ public class FxApp extends Application {
         setScreen(TitleScreen.create(this));
     }
 
+    /** Shows the How to Play screen (the How to Play button). */
+    public void showHowToPlay() {
+        setScreen(HowToPlayScreen.create(this));
+    }
+
     /** Loads the first level and starts playing it (the Play button). */
     public void startGame() {
         try {
