@@ -3,3 +3,7 @@ target/
 *.iml
 .vscode/
 *.class
+# Java crash reports, written when the JVM crashes
+hs_err_pid*.log
+# macOS folder settings
+.DS_Store
