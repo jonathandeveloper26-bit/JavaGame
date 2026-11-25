@@ -1,0 +1,24 @@
+# Level 3 - Predators
+# Owner: Stephan (S9). Introduces a snake on the start bank and a fish in open water.
+#
+# Four lily pads form a chain across the river. The fish swims beside the chain. The
+# snake sits on the start bank and can only bite while the frog is on a bank.
+#
+# Route (checked by LevelsTest, levelThreeCanBeWonThroughTheController): walk up to
+# the water's edge at y 0.555, hop to the pad at 0.46, then to 0.38, 0.30 and 0.22,
+# then hop onto the far bank.
+
+turns 25
+bank far 0.14
+bank start 0.12
+frog 0.50 0.58
+
+lilypad 0.50 0.46 0.08
+lilypad 0.50 0.38 0.08
+lilypad 0.50 0.30 0.08
+lilypad 0.50 0.22 0.08
+
+fish  0.36 0.34
+snake 0.14 0.60
+
+bag twig 2

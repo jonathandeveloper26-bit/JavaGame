@@ -67,20 +67,20 @@ All sizes are diameters in play-area widths. In a 900-pixel-wide window, 0.01 is
 pixels. The frog is 0.04 (GDD section 2.1) and is not placed with an element line.
 
 | Type | What it is | Default diameter | Why this size |
-| --- | --- | --- | --- |
-| `twig` | Thrown object, small | 0.05 | GDD section 2.2. Just bigger than the frog: room to stand, not to walk. |
-| `plank` | Thrown object, medium | 0.10 | GDD section 2.2. Room for a short walk. |
-| `log` | Thrown object, large | 0.18 | GDD section 2.2. Room to walk along it. |
-| `lilypad` | Lily pad | 0.08 | Twice the frog: an easy landing, smaller than a plank. |
-| `turtle` | Sleeping turtle | 0.07 | Clearly bigger than the frog, so it reads as an obstacle. |
-| `reed` | Reed clump | 0.10 | Big enough to cast a useful ripple shadow. |
-| `icon` | Throwable icon | 0.04 | The frog's size: easy to see and to touch. |
-| `fly` | Food | 0.025 | Small, so it takes a deliberate move to reach. |
-| `minnow` | Food | 0.03 | A little larger than a fly. |
-| `breadcrumb` | Food | 0.025 | Same as a fly. |
-| `snake` | Predator | 0.07 | Larger than the frog, so it is easy to spot. |
-| `bird` | Predator | 0.06 | Slightly smaller than a snake. |
-| `fish` | Predator | 0.06 | Same as a bird. |
+| --- | --- |------------------| --- |
+| `twig` | Thrown object, small | 0.05             | GDD section 2.2. Just bigger than the frog: room to stand, not to walk. |
+| `plank` | Thrown object, medium | 0.10             | GDD section 2.2. Room for a short walk. |
+| `log` | Thrown object, large | 0.18             | GDD section 2.2. Room to walk along it. |
+| `lilypad` | Lily pad | 0.08             | Twice the frog: an easy landing, smaller than a plank. |
+| `turtle` | Sleeping turtle | 0.07             | Clearly bigger than the frog, so it reads as an obstacle. |
+| `reed` | Reed clump | 0.10             | Big enough to cast a useful ripple shadow. |
+| `icon` | Throwable icon | 0.04             | The frog's size: easy to see and to touch. |
+| `fly` | Food | 0.025            | Small, so it takes a deliberate move to reach. |
+| `minnow` | Food | 0.03             | A little larger than a fly. |
+| `breadcrumb` | Food | 0.025            | Same as a fly. |
+| `snake` | Predator | 0.08             | Larger than the frog, so it is easy to spot. |
+| `bird` | Predator | 0.06             | Slightly smaller than a snake. |
+| `fish` | Predator | 0.06             | Same as a bird. |
 
 These are starting values [proposed], tuned at the balancing session on 25 November.
 Each class owner adds their defaults to `Balance` when they write the class: the thrown

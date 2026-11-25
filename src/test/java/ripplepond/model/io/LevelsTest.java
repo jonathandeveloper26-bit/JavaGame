@@ -29,6 +29,10 @@ import ripplepond.model.movement.MoveMode;
 import ripplepond.model.movement.Swim;
 import ripplepond.model.movement.Walk;
 import ripplepond.model.progress.Rank;
+import ripplepond.controller.GameController;
+import ripplepond.model.progress.FrogProgress;
+import ripplepond.model.progress.GameSession;
+import ripplepond.model.movement.Swim;
 
 /**
  * Plays the game's real level files from start to finish, with a rank 1 frog and only
@@ -174,6 +178,51 @@ class LevelsTest {
         Frog frog = level.getPond().getFrog();
         assertTrue(frog.getEnergy() > 10, "energy left: " + frog.getEnergy());
         assertEquals(1, level.getBag().count(ThrowableKind.TWIG));
+    }
+
+    // Level 3, played through GameController with a rank 1 frog
+
+    @Test
+    void levelThreeCanBeWonThroughTheController() throws LevelFormatException {
+        GameController controller = new GameController(new GameSession(
+                List.of("levels/level3.txt"), loader, new FrogProgress()));
+        controller.startLevel(0);
+
+        controllerStep(controller, new Walk(), 0.50, 0.555);
+        controllerStep(controller, new Hop(), 0.50, 0.46);
+        controllerStep(controller, new Hop(), 0.50, 0.38);
+        controllerStep(controller, new Hop(), 0.50, 0.30);
+        controllerStep(controller, new Hop(), 0.50, 0.22);
+        controllerStep(controller, new Hop(), 0.50, 0.12);
+
+        assertInstanceOf(Won.class, controller.getLevel().getState());
+        assertTrue(controller.getLevel().getPond().getFrog().isAlive());
+    }
+
+    // Level 4, played at rank 3 because swimming is locked below it
+
+    @Test
+    void levelFourCanBeWonAtRankThree() throws LevelFormatException {
+        GameController controller = new GameController(new GameSession(
+                List.of("levels/level4.txt"), loader, new FrogProgress(120)));
+        controller.startLevel(0);
+
+        controllerStep(controller, new Hop(), 0.50, 0.47);
+        controllerStep(controller, new Swim(), 0.50, 0.37);
+        controllerStep(controller, new Swim(), 0.50, 0.27);
+        controllerStep(controller, new Swim(), 0.50, 0.17);
+        controllerStep(controller, new Swim(), 0.50, 0.11);
+
+        assertInstanceOf(Won.class, controller.getLevel().getState());
+        assertTrue(controller.getLevel().getPond().getFrog().isAlive());
+    }
+
+    /** Makes one move through the controller and checks the frog ended where sent. */
+    private static void controllerStep(GameController controller, MoveMode mode, double x, double y) {
+        controller.submit(new TurnAction(null, null, mode, new Vec2(x, y)));
+        Vec2 frog = controller.getLevel().getPond().getFrog().getPosition();
+        assertEquals(x, frog.getX(), 1e-9, "turn " + controller.getLevel().getTurn() + " x");
+        assertEquals(y, frog.getY(), 1e-9, "turn " + controller.getLevel().getTurn() + " y");
     }
 
     // Level 5, played with a rank 3 frog (hop 0.14, can swim)

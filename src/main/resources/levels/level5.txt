@@ -32,9 +32,8 @@ breadcrumb 0.50 0.595        # at the water's edge
 minnow     0.50 0.46         # on P1
 fly        0.52 0.165        # on the swim route
 
-# Predators, once Stephan's S6 registers them in the ElementFactory:
-# snake 0.20 0.04            # on the far bank
-# bird  0.80 0.30            # over the water
-# fish  0.35 0.40            # in the water
-
+# Predators: the snake sits on the start bank, the bird and fish are in the water.
+snake 0.20 0.63
+bird  0.80 0.30
+fish  0.35 0.40
 bag twig 2
