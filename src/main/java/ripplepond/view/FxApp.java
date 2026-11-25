@@ -99,9 +99,9 @@ public class FxApp extends Application {
         showLevel();
     }
 
-    /** Shows the level complete screen. */
+    /** Shows the level complete screen, with the summary of the level just won. */
     public void showLevelComplete() {
-        setScreen(LevelCompleteScreen.create(this));
+        setScreen(LevelCompleteScreen.create(this, LevelSummary.of(controller)));
     }
 
     /** Shows the game over screen. */
