@@ -52,6 +52,11 @@ public class FxApp extends Application {
         setScreen(TitleScreen.create(this));
     }
 
+    /** Shows the How to Play screen (the How to Play button). */
+    public void showHowToPlay() {
+        setScreen(HowToPlayScreen.create(this));
+    }
+
     /** Loads the first level and starts playing it (the Play button). */
     public void startGame() {
         try {
@@ -94,14 +99,14 @@ public class FxApp extends Application {
         showLevel();
     }
 
-    /** Shows the level complete screen. */
+    /** Shows the level complete screen, with the summary of the level just won. */
     public void showLevelComplete() {
-        setScreen(LevelCompleteScreen.create(this));
+        setScreen(LevelCompleteScreen.create(this, LevelSummary.of(controller)));
     }
 
-    /** Shows the game over screen. */
+    /** Shows the game over screen, with why the level was lost. */
     public void showGameOver() {
-        setScreen(GameOverScreen.create(this));
+        setScreen(GameOverScreen.create(this, LossSummary.of(controller)));
     }
 
     /** Sets a screen that is not the level, and stops the river animation. */
